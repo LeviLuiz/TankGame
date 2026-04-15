@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Tank Game</title>
+</head>
+<body>
+    <div id="config"></div>
+    <div id="choice">
+        <div class="div-choice">
+            <button class="choice" onclick="mode = 1; verMode()">Singleplayer</button>
+            <button class="choice" onclick="mode = 2; verMode()">2 Players</button>
+        </div>
+        <div class="div-choice">
+            <button class="choice" onclick="mode = 3; verMode()">3 Players</button>
+            <button class="choice" onclick="mode = 4; verMode()">4 Players</button>
+        </div>
+    </div>
+    <div id="game">
+        <div class="reload" style="display: none;">
+            <h2 id="reloadTime">Recarregado</h2>
+        </div>
+        <div class="score">
+            <h2 id="scoreScreen">Score: 0</h2>
+        </div>
+        <div id="tank" style="display: none;">
+            <div id="torre">
+                <div id="cabeca"></div>
+                <div id="cano"></div>
+            </div>
+            <div id="corpo"></div>
+        </div>
+        <div id="inimigo">
+            <div id="torrei">
+                <div id="cabecai"></div>
+                <div id="canoi"></div>
+            </div>
+            <div id="corpoi"></div>
+        </div>
+    </div>
+</body>
+    <script src="script.js"></script>
+</html>

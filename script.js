@@ -12,7 +12,7 @@ let tanks = [];
 let bullets = [];
 let keys = {};
 let gameOver = false;
-let botsNumber = localStorage.getItem("bots") ?? 0;
+let botsNumber = localStorage.getItem("bots") || 0;
 
 const slider = document.getElementById("botsConfig");
 const label = document.getElementById("botsNumber");
@@ -28,6 +28,12 @@ const RELOAD_TIME = 2000;
 
 body.style.overflow = "hidden";
 
+let waitingKey = null;
+
+function setControl(playerIndex, action) {
+    waitingKey = { playerIndex, action };
+}
+
 function tocarSom(audio) {
     audio.volume = 0.5;
     audio.currentTime = 0;
@@ -38,6 +44,25 @@ function tocarSom(audio) {
 // INPUT
 // =========================
 document.addEventListener("keydown", (e) => {
+    // 👇 NOVO: captura tecla pra configurar
+    if (waitingKey) {
+        const controls = getSavedControls();
+
+        if (!controls[waitingKey.playerIndex]) {
+            controls[waitingKey.playerIndex] = getControls(
+                waitingKey.playerIndex,
+            );
+        }
+
+        controls[waitingKey.playerIndex][waitingKey.action] = e.code;
+
+        localStorage.setItem("controls", JSON.stringify(controls));
+
+        waitingKey = null;
+        renderControls();
+        return;
+    }
+
     keys[e.code] = true;
 
     if (e.repeat || gameOver) return;
@@ -68,7 +93,7 @@ function verMode() {
         if (botsNumber > 0) {
             startMatch(1, botsNumber);
         } else {
-            startMatch(1, 1)
+            startMatch(1, 1);
         }
     } else if (mode === 2) {
         startMatch(2, botsNumber);
@@ -183,6 +208,39 @@ function getControls(i) {
     return presets[i] || presets[0];
 }
 
+function getSavedControls() {
+    return (
+        JSON.parse(localStorage.getItem("controls")) || [
+            getControls(0),
+            getControls(1),
+            getControls(2),
+            getControls(3),
+        ]
+    );
+}
+
+function renderControls() {
+    for (let i = 0; i < 4; i++) {
+        const c = getSavedControls()[i];
+
+        document.getElementById(`player${i + 1}l`).textContent =
+            "Left: " + c.left;
+        document.getElementById(`player${i + 1}r`).textContent =
+            "Right: " + c.right;
+        document.getElementById(`player${i + 1}u`).textContent = "Up: " + c.up;
+        document.getElementById(`player${i + 1}d`).textContent =
+            "Down: " + c.down;
+        document.getElementById(`player${i + 1}tl`).textContent =
+            "Turret Left: " + c.turretLeft;
+        document.getElementById(`player${i + 1}td`).textContent =
+            "Turret Right: " + c.turretRight;
+        document.getElementById(`player${i + 1}f`).textContent =
+            "Fire: " + c.fire;
+    }
+}
+
+renderControls();
+
 // =========================
 // START
 // =========================
@@ -220,7 +278,7 @@ function startMatch(players, bots = 0) {
             cooldown: false,
             ammo: 10,
             score: 0,
-            controls: getControls(i),
+            controls: getSavedControls()[i],
             angle: 0,
             turretAngle: 0,
         };
@@ -391,7 +449,7 @@ function updateHUD() {
     ">`;
 
     if (mode == 1) {
-        tanks.forEach((t) => {
+        tanks.filter(t => t.alive).forEach((t) => {
             let status;
 
             if (t.ammo === 0) {
@@ -402,7 +460,7 @@ function updateHUD() {
                 status = "OK";
             }
 
-            html += `P${t.id + 1} | ${t.alive ? "VIVO" : "MORTO"} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+            html += `P${t.id + 1} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
         });
     } else {
         tanks.forEach((t) => {

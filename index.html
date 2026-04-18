@@ -1,54 +1,138 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <title>Tank Game</title>
-</head>
-<body>
-    <button id="config" onclick="openConfig()"><i class="fa-solid fa-gear"></i></button>
-    <div id="overlay"></div>
-    <div id="configScreen">
-        <label for="botsConfig" id="botsNumber">Número de Bots: 0</label>
-        <br>
-        <input type="range" name="bots" id="botsConfig" max="5" oninput="document.getElementById('botsNumber').textContent = 'Número de Bots: ' + this.value">
-        <br>
-        <button onclick="salvarConfig()">Salvar</button>
-    </div>
-    <div id="choice">
-        <div class="div-choice">
-            <button class="choice" onclick="mode = 1; verMode()">Singleplayer</button>
-            <button class="choice" onclick="mode = 2; verMode()">2 Players</button>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <link rel="stylesheet" href="style.css" />
+        <title>Tank Game</title>
+    </head>
+    <body>
+        <button id="config" onclick="openConfig()">
+            <i class="fa-solid fa-gear"></i>
+        </button>
+        <div id="overlay"></div>
+        <div id="configScreen">
+            <label for="botsConfig" id="botsNumber">Número de Bots: 0</label>
+            <br />
+            <input
+                type="range"
+                name="bots"
+                id="botsConfig"
+                max="5"
+                oninput="
+                    document.getElementById('botsNumber').textContent =
+                        'Número de Bots: ' + this.value
+                "
+            />
+            <br />
+            <br />
+            <h3>Controles</h3>
+            <br />
+            <p id="player1l" onclick="setControl(0, 'left')"></p>
+            <p id="player1r" onclick="setControl(0, 'right')"></p>
+            <p id="player1u" onclick="setControl(0, 'up')"></p>
+            <p id="player1d" onclick="setControl(0, 'down')"></p>
+            <p id="player1td" onclick="setControl(0, 'turretRight')"></p>
+            <p id="player1tl" onclick="setControl(0, 'turretLeft')"></p>
+            <p id="player1f" onclick="setControl(0, 'fire')"></p>
+            <br />
+
+            <p id="player2l" onclick="setControl(1, 'left')"></p>
+            <p id="player2r" onclick="setControl(1, 'right')"></p>
+            <p id="player2u" onclick="setControl(1, 'up')"></p>
+            <p id="player2d" onclick="setControl(1, 'down')"></p>
+            <p id="player2td" onclick="setControl(1, 'turretRight')"></p>
+            <p id="player2tl" onclick="setControl(1, 'turretLeft')"></p>
+            <p id="player2f" onclick="setControl(1, 'fire')"></p>
+            <br />
+
+            <p id="player3l" onclick="setControl(2, 'left')"></p>
+            <p id="player3r" onclick="setControl(2, 'right')"></p>
+            <p id="player3u" onclick="setControl(2, 'up')"></p>
+            <p id="player3d" onclick="setControl(2, 'down')"></p>
+            <p id="player3td" onclick="setControl(2, 'turretRight')"></p>
+            <p id="player3tl" onclick="setControl(2, 'turretLeft')"></p>
+            <p id="player3f" onclick="setControl(2, 'fire')"></p>
+            <br />
+
+            <p id="player4l" onclick="setControl(3, 'left')"></p>
+            <p id="player4r" onclick="setControl(3, 'right')"></p>
+            <p id="player4u" onclick="setControl(3, 'up')"></p>
+            <p id="player4d" onclick="setControl(3, 'down')"></p>
+            <p id="player4td" onclick="setControl(3, 'turretRight')"></p>
+            <p id="player4tl" onclick="setControl(3, 'turretLeft')"></p>
+            <p id="player4f" onclick="setControl(3, 'fire')"></p>
+            <br />
+            <button onclick="salvarConfig()">Salvar</button>
         </div>
-        <div class="div-choice">
-            <button class="choice" onclick="mode = 3; verMode()">3 Players</button>
-            <button class="choice" onclick="mode = 4; verMode()">4 Players</button>
-        </div>
-    </div>
-    <div id="game">
-        <div class="reload" style="display: none;">
-            <h2 id="reloadTime">Recarregado</h2>
-        </div>
-        <div class="score">
-            <h2 id="scoreScreen">Score: 0</h2>
-        </div>
-        <div id="tank" style="display: none;">
-            <div id="torre">
-                <div id="cabeca"></div>
-                <div id="cano"></div>
+        <div id="choice">
+            <div class="div-choice">
+                <button
+                    class="choice"
+                    onclick="
+                        mode = 1;
+                        verMode();
+                    "
+                >
+                    Singleplayer
+                </button>
+                <button
+                    class="choice"
+                    onclick="
+                        mode = 2;
+                        verMode();
+                    "
+                >
+                    2 Players
+                </button>
             </div>
-            <div id="corpo"></div>
-        </div>
-        <div id="inimigo">
-            <div id="torrei">
-                <div id="cabecai"></div>
-                <div id="canoi"></div>
+            <div class="div-choice">
+                <button
+                    class="choice"
+                    onclick="
+                        mode = 3;
+                        verMode();
+                    "
+                >
+                    3 Players
+                </button>
+                <button
+                    class="choice"
+                    onclick="
+                        mode = 4;
+                        verMode();
+                    "
+                >
+                    4 Players
+                </button>
             </div>
-            <div id="corpoi"></div>
         </div>
-    </div>
-</body>
+        <div id="game">
+            <div class="reload" style="display: none">
+                <h2 id="reloadTime">Recarregado</h2>
+            </div>
+            <div class="score">
+                <h2 id="scoreScreen">Score: 0</h2>
+            </div>
+            <div id="tank" style="display: none">
+                <div id="torre">
+                    <div id="cabeca"></div>
+                    <div id="cano"></div>
+                </div>
+                <div id="corpo"></div>
+            </div>
+            <div id="inimigo">
+                <div id="torrei">
+                    <div id="cabecai"></div>
+                    <div id="canoi"></div>
+                </div>
+                <div id="corpoi"></div>
+            </div>
+        </div>
+    </body>
     <script src="script.js"></script>
 </html>

@@ -3,11 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <title>Tank Game</title>
 </head>
 <body>
-    <div id="config"></div>
+    <button id="config" onclick="openConfig()"><i class="fa-solid fa-gear"></i></button>
+    <div id="overlay"></div>
+    <div id="configScreen">
+        <label for="botsConfig" id="botsNumber">Número de Bots: 0</label>
+        <input type="range" name="bots" id="botsConfig" max="5" oninput="document.getElementById('botsNumber').textContent = 'Número de Bots: ' + this.value">
+        <br>
+        <button onclick="salvarConfig()">Salvar</button>
+    </div>
     <div id="choice">
         <div class="div-choice">
             <button class="choice" onclick="mode = 1; verMode()">Singleplayer</button>

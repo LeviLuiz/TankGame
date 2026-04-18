@@ -12,11 +12,12 @@ let tanks = [];
 let bullets = [];
 let keys = {};
 let gameOver = false;
+let botsNumber = localStorage.getItem('bots') ?? 0
 
 const TANK_SIZE = 50;
+const TANK_SIDE = TANK_SIZE + 20;
 const BULLET_SIZE = 8;
 
-const GRAVITY = 0.1;
 const RELOAD_TIME = 2000;
 
 body.style.overflow = "hidden";
@@ -36,7 +37,7 @@ document.addEventListener("keydown", (e) => {
     if (e.repeat || gameOver) return;
 
     for (const t of tanks) {
-        if (!t.controls) continue; // 🔥 evita erro
+        if (!t.controls) continue; //evita erro
 
         if (e.code === t.controls.fire) {
             shoot(t);
@@ -58,13 +59,13 @@ function verMode() {
     clearGame();
 
     if (mode === 1) {
-        startMatch(1, 3); // 🔥 1 player vs 3 bots
+        startMatch(1, 3); //1 player vs 3 bots
     } else if (mode === 2) {
-        startMatch(2, 0); // 2 players + 0 bot
+        startMatch(2, botsNumber);
     } else if (mode === 3) {
-        startMatch(3, 0);
+        startMatch(3, botsNumber);
     } else if (mode === 4) {
-        startMatch(4, 0);
+        startMatch(4, botsNumber);
     }
 }
 
@@ -87,7 +88,7 @@ function createTankEl(color) {
     const el = document.createElement("div");
 
     el.style.position = "absolute";
-    el.style.width = TANK_SIZE + "px";
+    el.style.width = TANK_SIDE + "px";
     el.style.height = TANK_SIZE + "px";
     el.style.background = color;
     el.style.borderRadius = "6px";
@@ -95,24 +96,24 @@ function createTankEl(color) {
     el.style.boxShadow = "inset -6px -6px 0 rgba(0,0,0,0.3)";
     el.style.transition = "transform 0.05s linear";
 
-    // 🔥 BASE DA TORRE
+    //BASE DA TORRE
     const turret = document.createElement("div");
     turret.style.position = "absolute";
     turret.style.width = "26px";
     turret.style.height = "26px";
     turret.style.background = "#333";
     turret.style.borderRadius = "50%";
-    turret.style.top = "12px";
-    turret.style.left = "12px";
+    turret.style.top = "10px";
+    turret.style.left = "20px";
     turret.style.border = "2px solid #111";
 
-    // 🔥 CANO
+    //CANO
     const cannon = document.createElement("div");
     cannon.style.position = "absolute";
     cannon.style.width = "30px";
-    cannon.style.height = "6px";
+    cannon.style.height = "8px";
     cannon.style.background = "#111";
-    cannon.style.top = "10px";
+    cannon.style.top = "7px";
     cannon.style.left = "20px";
     cannon.style.borderRadius = "3px";
 
@@ -120,7 +121,7 @@ function createTankEl(color) {
     turret.appendChild(cannon);
     el.appendChild(turret);
 
-    // 🔥 guarda referência
+    //guarda referência
     el.cannon = turret;
 
     return el;
@@ -184,16 +185,30 @@ function startMatch(players, bots = 0) {
 
         body.appendChild(el);
 
+        posicaox = 100;
+        posicaoy = 100;
+
+        if (i == 0) {
+            posicaox = 100;
+            posicaoy = 100;
+        } else if (i == 1) {
+            posicaox = window.innerWidth - 100;
+        } else if (i == 2) {
+            posicaoy = window.innerHeight - 100;
+        } else {
+            posicaox = window.innerWidth - 100;
+            posicaoy = window.innerHeight - 100;
+        }
+
         const t = {
             id: i,
             el,
-            x: 100 + i * 150,
-            y: 100,
+            x: posicaox,
+            y: posicaoy,
             speed: 2,
             alive: true,
             cooldown: false,
             ammo: 10,
-            facing: 1,
             score: 0,
             controls: getControls(i),
             angle: 0,
@@ -223,7 +238,7 @@ function createBot(id) {
         id: id,
         el,
 
-        x: Math.random() * (window.innerWidth - 200) + 100,
+        x: Math.random() * (window.innerWidth - 200) + 500,
         y: Math.random() * (window.innerHeight - 200) + 100,
 
         speed: 1 + Math.random() * 0.7,
@@ -241,7 +256,7 @@ function createBot(id) {
 
         isBot: true,
 
-        // 🔥 controle de alvo (ESSENCIAL)
+        //controle de alvo (ESSENCIAL)
         target: null,
         lastTargetChange: 0,
         lastShot: 0,
@@ -287,10 +302,8 @@ function moveBot(t) {
     let turretDiff = desiredTurret - t.turretAngle;
     turretDiff = Math.atan2(Math.sin(turretDiff), Math.cos(turretDiff));
 
-    if (turretDiff > 0) {
-        t.turretAngle += 0.05;
-    } else {
-        t.turretAngle -= 0.05;
+    if (Math.abs(turretDiff) > 0.02) {
+        t.turretAngle += Math.sign(turretDiff) * 0.05;
     }
 
     // =========================
@@ -331,8 +344,9 @@ function moveBot(t) {
     // TIRO
     // =========================
     const alinhado = Math.abs(turretDiff) < 0.2;
+    const ALCANCE_TIRO = 400;
 
-    if (alinhado && agora - t.lastShot > t.reaction) {
+    if (dist < ALCANCE_TIRO && alinhado && agora - t.lastShot > t.reaction) {
         shoot(t);
         t.lastShot = agora;
     }
@@ -366,19 +380,35 @@ function updateHUD() {
         white-space:pre;
     ">`;
 
-    tanks.forEach((t) => {
-        let status;
+    if (mode == 1) {
+        tanks.forEach((t) => {
+            let status;
 
-        if (t.ammo === 0) {
-            status = "SEM MUNIÇÃO";
-        } else if (t.cooldown) {
-            status = "⏳";
-        } else {
-            status = "OK";
-        }
+            if (t.ammo === 0) {
+                status = "SEM MUNIÇÃO";
+            } else if (t.cooldown) {
+                status = "⏳";
+            } else {
+                status = "OK";
+            }
 
-        html += `P${t.id + 1} | ${t.alive ? "VIVO" : "MORTO"} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
-    });
+            html += `P${t.id + 1} | ${t.alive ? "VIVO" : "MORTO"} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+        });
+    } else {
+        tanks.forEach((t) => {
+            let status;
+
+            if (t.ammo === 0) {
+                status = "SEM MUNIÇÃO";
+            } else if (t.cooldown) {
+                status = "⏳";
+            } else {
+                status = "OK";
+            }
+
+            html += `P${t.id + 1} | ${t.alive ? "VIVO" : "MORTO"} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+        });
+    }
 
     html += `</div>`;
 
@@ -393,7 +423,7 @@ function moveTank(t) {
 
     const TURRET_SPEED = 0.07;
 
-    // 🔥 girar torre
+    // girar torre
     if (keys[t.controls.turretLeft]) {
         t.turretAngle -= TURRET_SPEED;
     }
@@ -402,7 +432,7 @@ function moveTank(t) {
         t.turretAngle += TURRET_SPEED;
     }
 
-    // 🔥 ROTACIONAR
+    // ROTACIONAR
     if (keys[t.controls.left]) {
         t.angle -= ROT_SPEED;
     }
@@ -411,13 +441,13 @@ function moveTank(t) {
         t.angle += ROT_SPEED;
     }
 
-    // 🔥 MOVER PRA FRENTE
+    // MOVER PRA FRENTE
     if (keys[t.controls.up]) {
         t.x += Math.cos(t.angle) * MOVE_SPEED;
         t.y += Math.sin(t.angle) * MOVE_SPEED;
     }
 
-    // 🔥 RÉ
+    // RÉ
     if (keys[t.controls.down]) {
         t.x -= Math.cos(t.angle) * MOVE_SPEED * 0.6; // mais lento
         t.y -= Math.sin(t.angle) * MOVE_SPEED * 0.6;
@@ -432,7 +462,7 @@ function moveTank(t) {
 
     t.el.style.transform = `rotate(${t.angle}rad)`;
 
-    // 🔥 torre gira independente
+    // torre gira independente
     t.el.cannon.style.transform = `rotate(${t.turretAngle - t.angle}rad)`;
 }
 
@@ -459,7 +489,7 @@ function shoot(t) {
 
     const barrelLength = 30;
 
-    const spawnX = t.x + TANK_SIZE / 2 + Math.cos(t.turretAngle) * barrelLength;
+    const spawnX = t.x + TANK_SIDE / 2 + Math.cos(t.turretAngle) * barrelLength;
     const spawnY = t.y + TANK_SIZE / 2 + Math.sin(t.turretAngle) * barrelLength;
 
     const speed = 6;
@@ -471,8 +501,8 @@ function shoot(t) {
         vx: Math.cos(t.turretAngle) * speed,
         vy: Math.sin(t.turretAngle) * speed,
         owner: t,
-        life: 0, // 🔥 tempo atual
-        maxLife: 180, // 🔥 duração (frames)
+        life: 0, // tempo atual
+        maxLife: 80, // duração (frames)
     };
 
     bulletEl.style.left = spawnX + "px";
@@ -497,18 +527,29 @@ function updateBullets() {
             return false;
         }
 
-        for (const t of tanks) {
-            b.life++;
-            b.vx *= 0.997;
-            b.vy *= 0.997;
+        b.life++;
+        b.vx *= 0.995;
+        b.vy *= 0.995;
 
+        for (const t of tanks) {
             if (b.life > b.maxLife) {
                 b.el.remove();
                 return false;
             }
             if (!t.alive || t === b.owner) continue;
 
-            if (Math.abs(b.x - t.x) < 40 && Math.abs(b.y - t.y) < 40) {
+            const tankLeft = t.x;
+            const tankRight = t.x + TANK_SIDE;
+            const tankTop = t.y;
+            const tankBottom = t.y + TANK_SIZE;
+
+            const hit =
+                b.x > tankLeft &&
+                b.x < tankRight &&
+                b.y > tankTop &&
+                b.y < tankBottom;
+
+            if (hit) {
                 b.el.remove();
                 b.owner.score++;
                 t.alive = false;
@@ -529,7 +570,7 @@ function updateBullets() {
 function checkLoot() {
     for (const t of tanks) {
         if (!t.alive && t.loot > 0) {
-            // 🔥 mostra loot só 1 vez por frame
+            //mostra loot só 1 vez por frame
             t.el.innerText = "+" + t.loot;
 
             for (const p of tanks) {
@@ -542,7 +583,7 @@ function checkLoot() {
                     p.y + TANK_SIZE > t.y;
 
                 if (pegou) {
-                    p.ammo = Math.min(p.ammo + t.loot, 30); // 🔥 limite
+                    p.ammo = Math.min(p.ammo + t.loot, 30); //limite
                     t.loot = 0;
 
                     t.el.innerText = ""; // limpa texto
@@ -565,7 +606,7 @@ function checkWin() {
         setTimeout(() => {
             alert(`Jogador ${alive[0].id + 1} venceu!`);
             location.reload();
-        }, 400);
+        }, 100);
     }
 }
 
@@ -588,4 +629,16 @@ function loop() {
     if (!gameOver) {
         requestAnimationFrame(loop);
     }
+}
+
+function openConfig() {
+    document.getElementById('configScreen').style.display = 'flex';
+    document.getElementById('overlay').style.display = 'block';
+}
+
+function salvarConfig() {
+    botsNumber = document.getElementById('botsConfig').value
+    localStorage.setItem('bots', document.getElementById('botsConfig').value)
+    document.getElementById('configScreen').style.display = 'none';
+    document.getElementById('overlay').style.display = 'none';
 }

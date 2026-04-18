@@ -14,7 +14,7 @@ let bullets = [];
 let keys = {};
 let gameOver = false;
 let botsNumber = localStorage.getItem("bots") || 0;
-let showHitbox = false;
+let showHitbox = false; // SEMPRE FALSE
 
 const slider = document.getElementById("botsConfig");
 const label = document.getElementById("botsNumber");

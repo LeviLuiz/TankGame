@@ -12,6 +12,7 @@
     <div id="overlay"></div>
     <div id="configScreen">
         <label for="botsConfig" id="botsNumber">Número de Bots: 0</label>
+        <br>
         <input type="range" name="bots" id="botsConfig" max="5" oninput="document.getElementById('botsNumber').textContent = 'Número de Bots: ' + this.value">
         <br>
         <button onclick="salvarConfig()">Salvar</button>

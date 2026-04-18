@@ -12,7 +12,13 @@ let tanks = [];
 let bullets = [];
 let keys = {};
 let gameOver = false;
-let botsNumber = localStorage.getItem('bots') ?? 0
+let botsNumber = localStorage.getItem("bots") ?? 0;
+
+const slider = document.getElementById("botsConfig");
+const label = document.getElementById("botsNumber");
+
+slider.value = botsNumber;
+label.textContent = "Número de Bots: " + botsNumber;
 
 const TANK_SIZE = 50;
 const TANK_SIDE = TANK_SIZE + 20;
@@ -59,7 +65,11 @@ function verMode() {
     clearGame();
 
     if (mode === 1) {
-        startMatch(1, 3); //1 player vs 3 bots
+        if (botsNumber > 0) {
+            startMatch(1, botsNumber);
+        } else {
+            startMatch(1, 1)
+        }
     } else if (mode === 2) {
         startMatch(2, botsNumber);
     } else if (mode === 3) {
@@ -632,13 +642,13 @@ function loop() {
 }
 
 function openConfig() {
-    document.getElementById('configScreen').style.display = 'flex';
-    document.getElementById('overlay').style.display = 'block';
+    document.getElementById("configScreen").style.display = "flex";
+    document.getElementById("overlay").style.display = "block";
 }
 
 function salvarConfig() {
-    botsNumber = document.getElementById('botsConfig').value
-    localStorage.setItem('bots', document.getElementById('botsConfig').value)
-    document.getElementById('configScreen').style.display = 'none';
-    document.getElementById('overlay').style.display = 'none';
+    botsNumber = document.getElementById("botsConfig").value;
+    localStorage.setItem("bots", document.getElementById("botsConfig").value);
+    document.getElementById("configScreen").style.display = "none";
+    document.getElementById("overlay").style.display = "none";
 }

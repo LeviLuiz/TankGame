@@ -162,6 +162,29 @@ function createTankEl(color) {
     return el;
 }
 
+function createExplosion(x, y) {
+    const e = document.createElement("div");
+
+    e.style.position = "absolute";
+    e.style.left = x + "px";
+    e.style.top = y + "px";
+    e.style.width = "20px";
+    e.style.height = "20px";
+    e.style.borderRadius = "50%";
+    e.style.background = "orange";
+    e.style.pointerEvents = "none";
+    e.style.transition = "all 0.4s ease-out";
+
+    body.appendChild(e);
+
+    requestAnimationFrame(() => {
+        e.style.transform = "scale(4)";
+        e.style.opacity = "0";
+    });
+
+    setTimeout(() => e.remove(), 400);
+}
+
 // =========================
 // CONTROLES
 // =========================
@@ -624,6 +647,7 @@ function updateBullets() {
                 t.loot = t.ammo;
                 t.el.style.filter = "grayscale(100%)";
                 tocarSom(explosaoSom);
+                createExplosion(t.x, t.y)
 
                 checkWin();
                 updateHUD();

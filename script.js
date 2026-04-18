@@ -367,7 +367,7 @@ function createBot(id) {
         x: Math.random() * (window.innerWidth - 200) + 500,
         y: Math.random() * (window.innerHeight - 200) + 100,
 
-        speed: 0.8,
+        speed: 0.85,
         accuracy: Math.random(),
         reaction: 800 + Math.random() * 1200,
 

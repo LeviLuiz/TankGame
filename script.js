@@ -8,11 +8,13 @@ const explosaoSom = new Audio("explosao.mp3");
 
 let mode = 0;
 
+let walls = [];
 let tanks = [];
 let bullets = [];
 let keys = {};
 let gameOver = false;
 let botsNumber = localStorage.getItem("bots") || 0;
+let showHitbox = true;
 
 const slider = document.getElementById("botsConfig");
 const label = document.getElementById("botsNumber");
@@ -44,6 +46,9 @@ function tocarSom(audio) {
 // INPUT
 // =========================
 document.addEventListener("keydown", (e) => {
+    if (e.code === "KeyÇ") {
+        showHitbox = !showHitbox;
+    }
     // 👇 NOVO: captura tecla pra configurar
     if (waitingKey) {
         const controls = getSavedControls();
@@ -114,6 +119,35 @@ function clearGame() {
     tanks = [];
     bullets = [];
     gameOver = false;
+}
+
+function createWall(x, y, w, h) {
+    const el = document.createElement("div");
+
+    el.style.position = "absolute";
+    el.style.left = x + "px";
+    el.style.top = y + "px";
+    el.style.width = w + "px";
+    el.style.height = h + "px";
+    el.style.background = "#444";
+    el.style.border = "2px solid #111";
+
+    body.appendChild(el);
+
+    walls.push({ x, y, w, h, el });
+}
+
+function createMap() {
+    // bordas
+    createWall(0, 0, window.innerWidth, 5);
+    createWall(0, window.innerHeight - 5, window.innerWidth, 5);
+    createWall(0, 0, 5, window.innerHeight);
+    createWall(window.innerWidth - 5, 0, 5, window.innerHeight);
+
+    // obstáculos no meio
+    createWall(300, 200, 200, 40);
+    createWall(600, 400, 40, 200);
+    createWall(900, 150, 150, 40);
 }
 
 // =========================
@@ -318,6 +352,7 @@ function startMatch(players, bots = 0) {
     }
 
     updateHUD();
+    createMap();
     loop();
 }
 
@@ -332,7 +367,7 @@ function createBot(id) {
         x: Math.random() * (window.innerWidth - 200) + 500,
         y: Math.random() * (window.innerHeight - 200) + 100,
 
-        speed: 1 + Math.random() * 0.7,
+        speed: 0.8,
         accuracy: Math.random(),
         reaction: 800 + Math.random() * 1200,
 
@@ -411,6 +446,12 @@ function moveBot(t) {
         t.angle -= ROT_SPEED;
     }
 
+    let newX = t.x + Math.cos(t.angle) * t.speed;
+    let newY = t.y + Math.sin(t.angle) * t.speed;
+
+    if (!isColliding(newX, t.y)) t.x = newX;
+    if (!isColliding(t.x, newY)) t.y = newY;
+
     // =========================
     // DISTÂNCIA
     // =========================
@@ -421,15 +462,22 @@ function moveBot(t) {
     // =========================
     // MOVIMENTO
     // =========================
+    let moveX = 0;
+    let moveY = 0;
+
     if (dist > DISTANCIA_BOA) {
-        // avança
-        t.x += Math.cos(t.angle) * t.speed;
-        t.y += Math.sin(t.angle) * t.speed;
+        moveX = Math.cos(t.angle) * t.speed;
+        moveY = Math.sin(t.angle) * t.speed;
     } else if (dist < 100) {
-        // recua
-        t.x -= Math.cos(t.angle) * t.speed * 0.6;
-        t.y -= Math.sin(t.angle) * t.speed * 0.6;
+        moveX = -Math.cos(t.angle) * t.speed * 0.6;
+        moveY = -Math.sin(t.angle) * t.speed * 0.6;
     }
+
+    let newXbot = t.x + moveX;
+    let newYbot = t.y + moveY;
+
+    if (!isColliding(newXbot, t.y)) t.x = newXbot;
+    if (!isColliding(t.x, newYbot)) t.y = newYbot;
 
     // =========================
     // TIRO
@@ -455,6 +503,12 @@ function moveBot(t) {
     t.el.style.top = t.y + "px";
     t.el.style.transform = `rotate(${t.angle}rad)`;
     t.el.cannon.style.transform = `rotate(${t.turretAngle - t.angle}rad)`;
+
+    if (showHitbox) {
+        t.el.style.outline = "2px solid red";
+    } else {
+        t.el.style.outline = "none";
+    }
 }
 
 function updateHUD() {
@@ -472,19 +526,21 @@ function updateHUD() {
     ">`;
 
     if (mode == 1) {
-        tanks.filter(t => t.alive).forEach((t) => {
-            let status;
+        tanks
+            .filter((t) => t.alive)
+            .forEach((t) => {
+                let status;
 
-            if (t.ammo === 0) {
-                status = "SEM MUNIÇÃO";
-            } else if (t.cooldown) {
-                status = "⏳";
-            } else {
-                status = "OK";
-            }
+                if (t.ammo === 0) {
+                    status = "SEM MUNIÇÃO";
+                } else if (t.cooldown) {
+                    status = "⏳";
+                } else {
+                    status = "OK";
+                }
 
-            html += `P${t.id + 1} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
-        });
+                html += `P${t.id + 1} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+            });
     } else {
         tanks.forEach((t) => {
             let status;
@@ -506,24 +562,33 @@ function updateHUD() {
     scoreScreen.innerHTML = html;
 }
 
+function isColliding(x, y) {
+    const radius = TANK_SIDE / 2;
+
+    const centerX = x + TANK_SIDE / 2;
+    const centerY = y + TANK_SIZE / 2;
+
+    return walls.some((w) => {
+        const closestX = Math.max(w.x, Math.min(centerX, w.x + w.w));
+        const closestY = Math.max(w.y, Math.min(centerY, w.y + w.h));
+
+        const dx = centerX - closestX;
+        const dy = centerY - closestY;
+
+        return dx * dx + dy * dy < radius * radius;
+    });
+}
 function moveTank(t) {
     if (!t.alive) return;
 
-    const ROT_SPEED = 0.05; // velocidade de rotação
+    const ROT_SPEED = 0.05;
     const MOVE_SPEED = t.speed;
-
     const TURRET_SPEED = 0.07;
 
-    // girar torre
-    if (keys[t.controls.turretLeft]) {
-        t.turretAngle -= TURRET_SPEED;
-    }
+    let newX = t.x;
+    let newY = t.y;
 
-    if (keys[t.controls.turretRight]) {
-        t.turretAngle += TURRET_SPEED;
-    }
-
-    // ROTACIONAR
+    // rotação do tanque
     if (keys[t.controls.left]) {
         t.angle -= ROT_SPEED;
     }
@@ -532,29 +597,45 @@ function moveTank(t) {
         t.angle += ROT_SPEED;
     }
 
-    // MOVER PRA FRENTE
+    // movimento frente/ré
     if (keys[t.controls.up]) {
-        t.x += Math.cos(t.angle) * MOVE_SPEED;
-        t.y += Math.sin(t.angle) * MOVE_SPEED;
+        newX += Math.cos(t.angle) * MOVE_SPEED;
+        newY += Math.sin(t.angle) * MOVE_SPEED;
     }
 
-    // RÉ
     if (keys[t.controls.down]) {
-        t.x -= Math.cos(t.angle) * MOVE_SPEED * 0.6; // mais lento
-        t.y -= Math.sin(t.angle) * MOVE_SPEED * 0.6;
+        newX -= Math.cos(t.angle) * MOVE_SPEED * 0.6;
+        newY -= Math.sin(t.angle) * MOVE_SPEED * 0.6;
+    }
+
+    // colisão (AGORA FUNCIONA)
+    if (!isColliding(newX, t.y)) t.x = newX;
+    if (!isColliding(t.x, newY)) t.y = newY;
+
+    // torre
+    if (keys[t.controls.turretLeft]) {
+        t.turretAngle -= TURRET_SPEED;
+    }
+
+    if (keys[t.controls.turretRight]) {
+        t.turretAngle += TURRET_SPEED;
     }
 
     // limites da tela
     t.x = Math.max(0, Math.min(window.innerWidth - TANK_SIZE, t.x));
     t.y = Math.max(0, Math.min(window.innerHeight - TANK_SIZE, t.y));
 
+    // aplicar visual
     t.el.style.left = t.x + "px";
     t.el.style.top = t.y + "px";
-
     t.el.style.transform = `rotate(${t.angle}rad)`;
-
-    // torre gira independente
     t.el.cannon.style.transform = `rotate(${t.turretAngle - t.angle}rad)`;
+
+    if (showHitbox) {
+        t.el.style.outline = "2px solid red";
+    } else {
+        t.el.style.outline = "none";
+    }
 }
 
 function shoot(t) {
@@ -622,6 +703,16 @@ function updateBullets() {
         b.vx *= 0.995;
         b.vy *= 0.995;
 
+        for (const w of walls) {
+            const hitWall =
+                b.x > w.x && b.x < w.x + w.w && b.y > w.y && b.y < w.y + w.h;
+
+            if (hitWall) {
+                b.el.remove();
+                return false;
+            }
+        }
+
         for (const t of tanks) {
             if (b.life > b.maxLife) {
                 b.el.remove();
@@ -647,7 +738,7 @@ function updateBullets() {
                 t.loot = t.ammo;
                 t.el.style.filter = "grayscale(100%)";
                 tocarSom(explosaoSom);
-                createExplosion(t.x, t.y)
+                createExplosion(t.x, t.y);
 
                 checkWin();
                 updateHUD();
@@ -669,8 +760,8 @@ function checkLoot() {
                 if (!p.alive || p === t) continue;
 
                 const pegou =
-                    p.x < t.x + TANK_SIZE &&
-                    p.x + TANK_SIZE > t.x &&
+                    p.x < t.x + TANK_SIDE &&
+                    p.x + TANK_SIDE > t.x &&
                     p.y < t.y + TANK_SIZE &&
                     p.y + TANK_SIZE > t.y;
 

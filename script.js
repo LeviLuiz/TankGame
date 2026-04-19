@@ -5,6 +5,7 @@ const game = document.getElementById("game");
 const scoreScreen = document.getElementById("scoreScreen");
 const tiroSom = new Audio("disparo.mp3");
 const explosaoSom = new Audio("explosao.mp3");
+const clickSom = new Audio("click.mp3");
 
 let mode = 0;
 
@@ -357,26 +358,26 @@ function startMatch(players, bots = 0) {
 }
 
 function createBot(id) {
-    posicaobotx = 100
-    posicaoboty = 120
+    posicaobotx = 100;
+    posicaoboty = 120;
     const el = createTankEl("gray");
     body.appendChild(el);
 
     if (id == 1) {
-        posicaobotx = 50
-        posicaoboty = window.innerHeight - 50
+        posicaobotx = 50;
+        posicaoboty = window.innerHeight - 50;
     } else if (id == 2) {
-        posicaobotx = window.innerWidth - posicaobotx
+        posicaobotx = window.innerWidth - posicaobotx;
     } else if (id == 3) {
-        posicaobotx = window.innerWidth - posicaobotx
-        posicaoboty = window.innerHeight - posicaoboty
+        posicaobotx = window.innerWidth - posicaobotx;
+        posicaoboty = window.innerHeight - posicaoboty;
     } else if (id == 4) {
-        posicaobotx = window.innerWidth / 2 + 200
-        posicaoboty = window.innerHeight / 2
+        posicaobotx = window.innerWidth / 2 + 200;
+        posicaoboty = window.innerHeight / 2;
     } else if (id == 5) {
-        posicaobotx = window.innerWidth / 2 - 300
-        posicaoboty = window.innerHeight / 2
-    } 
+        posicaobotx = window.innerWidth / 2 - 300;
+        posicaoboty = window.innerHeight / 2;
+    }
 
     const bot = {
         id: id,
@@ -587,22 +588,24 @@ function updateHUD() {
                     status = "OK";
                 }
 
-                html += `P${t.id + 1} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+                html += `P${t.id + 1} | Munição: ${t.ammo} | ${status}\n`;
             });
     } else {
-        tanks.forEach((t) => {
-            let status;
+        tanks
+            .filter((t) => t.alive)
+            .forEach((t) => {
+                let status;
 
-            if (t.ammo === 0) {
-                status = "SEM MUNIÇÃO";
-            } else if (t.cooldown) {
-                status = "⏳";
-            } else {
-                status = "OK";
-            }
+                if (t.ammo === 0) {
+                    status = "SEM MUNIÇÃO";
+                } else if (t.cooldown) {
+                    status = "⏳";
+                } else {
+                    status = "OK";
+                }
 
-            html += `P${t.id + 1} | ${t.alive ? "VIVO" : "MORTO"} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
-        });
+                html += `P${t.id + 1} | Score: ${t.score} | Munição: ${t.ammo} | ${status}\n`;
+            });
     }
 
     html += `</div>`;
@@ -688,7 +691,12 @@ function moveTank(t) {
 }
 
 function shoot(t) {
-    if (!t.alive || t.cooldown || gameOver || t.ammo < 1) return;
+    if (!t.alive || gameOver) {
+        return;
+    } else if (t.cooldown || t.ammo < 1) {
+        tocarSom(clickSom);
+        return;
+    }
 
     tocarSom(tiroSom);
     t.ammo -= 1;

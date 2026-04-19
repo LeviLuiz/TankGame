@@ -333,7 +333,7 @@ function startMatch(players, bots = 0) {
             speed: 2,
             alive: true,
             cooldown: false,
-            ammo: 10,
+            ammo: 4,
             score: 0,
             controls: getSavedControls()[i],
             angle: 0,
@@ -357,15 +357,33 @@ function startMatch(players, bots = 0) {
 }
 
 function createBot(id) {
+    posicaobotx = 100
+    posicaoboty = 120
     const el = createTankEl("gray");
     body.appendChild(el);
+
+    if (id == 1) {
+        posicaobotx = 50
+        posicaoboty = window.innerHeight - 50
+    } else if (id == 2) {
+        posicaobotx = window.innerWidth - posicaobotx
+    } else if (id == 3) {
+        posicaobotx = window.innerWidth - posicaobotx
+        posicaoboty = window.innerHeight - posicaoboty
+    } else if (id == 4) {
+        posicaobotx = window.innerWidth / 2 + 200
+        posicaoboty = window.innerHeight / 2
+    } else if (id == 5) {
+        posicaobotx = window.innerWidth / 2 - 300
+        posicaoboty = window.innerHeight / 2
+    } 
 
     const bot = {
         id: id,
         el,
 
-        x: Math.random() * (window.innerWidth - 200) + 500,
-        y: Math.random() * (window.innerHeight - 200) + 100,
+        x: posicaobotx,
+        y: posicaoboty - 100,
 
         speed: 0.85,
         accuracy: Math.random(),
@@ -373,7 +391,7 @@ function createBot(id) {
 
         alive: true,
         cooldown: false,
-        ammo: 10,
+        ammo: 4,
 
         angle: Math.random() * Math.PI * 2,
         turretAngle: Math.random() * Math.PI * 2,
@@ -435,6 +453,16 @@ function moveBot(t) {
     // =========================
     // CORPO (movimento)
     // =========================
+
+    const lookAhead = 40;
+
+    const futureX = t.x + Math.cos(t.angle) * lookAhead;
+    const futureY = t.y + Math.sin(t.angle) * lookAhead;
+
+    if (isColliding(futureX, futureY)) {
+        t.angle += 0.1;
+    }
+
     let bodyDiff = desiredTurret - t.angle;
     bodyDiff = Math.atan2(Math.sin(bodyDiff), Math.cos(bodyDiff));
 
@@ -449,8 +477,28 @@ function moveBot(t) {
     let newX = t.x + Math.cos(t.angle) * t.speed;
     let newY = t.y + Math.sin(t.angle) * t.speed;
 
-    if (!isColliding(newX, t.y)) t.x = newX;
-    if (!isColliding(t.x, newY)) t.y = newY;
+    let moved = false;
+
+    if (!isColliding(newX, t.y)) {
+        t.x = newX;
+        moved = true;
+    }
+
+    if (!isColliding(t.x, newY)) {
+        t.y = newY;
+        moved = true;
+    }
+
+    // 👇 se travou, tenta escapar lateralmente
+    if (!moved) {
+        const angleOffset = Math.PI / 2;
+
+        const tryX = t.x + Math.cos(t.angle + angleOffset) * t.speed;
+        const tryY = t.y + Math.sin(t.angle + angleOffset) * t.speed;
+
+        if (!isColliding(tryX, t.y)) t.x = tryX;
+        if (!isColliding(t.x, tryY)) t.y = tryY;
+    }
 
     // =========================
     // DISTÂNCIA
@@ -578,6 +626,7 @@ function isColliding(x, y) {
         return dx * dx + dy * dy < radius * radius;
     });
 }
+
 function moveTank(t) {
     if (!t.alive) return;
 

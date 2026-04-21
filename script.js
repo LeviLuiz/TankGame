@@ -767,7 +767,7 @@ function shoot(t, robo) {
 
     const speed = 6;
 
-    let eRobo = robo || false
+    let eRobo = robo || false;
 
     let b;
 
@@ -811,7 +811,6 @@ function shoot(t, robo) {
             life: 0,
             maxLife: 80,
         };
-        console.log('rodo aq')
     }
 
     bullets.push(b);
@@ -882,7 +881,7 @@ function updateBullets() {
                     b.owner.score++;
                     t.loot = t.ammo;
                     t.el.style.filter = "grayscale(100%)";
-                    t.el.style.zIndex = '-1'
+                    t.el.style.zIndex = "-1";
                     tocarSom(explosaoSom);
                 }
                 createExplosion(t.x, t.y);
@@ -955,8 +954,8 @@ function createPowerUp(power) {
     item.style.position = "absolute";
     item.style.width = "40px";
     item.style.height = "40px";
-    item.style.background = 'orange'
-    item.style.borderRadius = '8px'
+    item.style.background = "orange";
+    item.style.borderRadius = "8px";
 
     const x = Math.random() * (window.innerWidth - 20);
     const y = Math.random() * (window.innerHeight - 20);
@@ -1004,6 +1003,38 @@ function checkColetou() {
     });
 }
 
+function isCollidingTanks(t1, t2) {
+    return (
+        t1.x < t2.x + TANK_SIDE &&
+        t1.x + TANK_SIDE > t2.x &&
+        t1.y < t2.y + TANK_SIZE &&
+        t1.y + TANK_SIZE > t2.y
+    );
+}
+
+function checkColision() {
+    for (let i = 0; i < tanks.length; i++) {
+        for (let j = i + 1; j < tanks.length; j++) {
+            const t1 = tanks[i];
+            const t2 = tanks[j];
+
+            if (!t1.alive || !t2.alive) continue;
+
+            if (isCollidingTanks(t1, t2)) {
+                console.log(`Colisão entre P${t1.id} e P${t2.id}`);
+                t1.x -= Math.cos(t1.angle) * 2;
+                t1.y -= Math.sin(t1.angle) * 2;
+
+                t2.x -= Math.cos(t2.angle) * 2;
+                t2.y -= Math.sin(t2.angle) * 2;
+
+                t1.vida -= 1
+                t2.vida -= 1
+            }
+        }
+    }
+}
+
 // =========================
 // LOOP
 // =========================
@@ -1021,6 +1052,7 @@ function loop() {
     updateHUD();
     addPowerUps();
     checkColetou();
+    checkColision();
 
     if (!gameOver) {
         requestAnimationFrame(loop);

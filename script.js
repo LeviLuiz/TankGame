@@ -1028,8 +1028,18 @@ function checkColision() {
                 t2.x -= Math.cos(t2.angle) * 2;
                 t2.y -= Math.sin(t2.angle) * 2;
 
-                t1.vida -= 1
-                t2.vida -= 1
+                t1.vida -= 1;
+                t2.vida -= 1;
+                if (t1.vida <= 0) {
+                    t1.alive = false;
+                    tocarSom(explosaoSom)
+                    createExplosion(t1.x, t1.y);
+                }
+                if (t2.vida <= 0) {
+                    t2.alive = false;
+                    tocarSom(explosaoSom)
+                    createExplosion(t2.x, t2.y);
+                }
             }
         }
     }

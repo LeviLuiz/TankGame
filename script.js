@@ -8,13 +8,14 @@ const explosaoSom = new Audio("explosao.mp3");
 const clickSom = new Audio("click.mp3");
 
 let mode = 0;
+let tankType = 2;
 
 let walls = [];
 let tanks = [];
 let bullets = [];
 let keys = {};
 let gameOver = false;
-let botsNumber = localStorage.getItem("bots") || 0;
+let botsNumber = parseInt(localStorage.getItem("bots")) || 0;
 let showHitbox = false; // SEMPRE FALSE
 
 const slider = document.getElementById("botsConfig");
@@ -47,7 +48,7 @@ function tocarSom(audio) {
 // INPUT
 // =========================
 document.addEventListener("keydown", (e) => {
-    if (e.code === "KeyÇ") {
+    if (e.code === "KeyP") {
         showHitbox = !showHitbox;
     }
     // 👇 NOVO: captura tecla pra configurar
@@ -311,8 +312,8 @@ function startMatch(players, bots = 0) {
 
         body.appendChild(el);
 
-        posicaox = 100;
-        posicaoy = 100;
+        let posicaox = 100;
+        let posicaoy = 100;
 
         if (i == 0) {
             posicaox = 100;
@@ -326,20 +327,47 @@ function startMatch(players, bots = 0) {
             posicaoy = window.innerHeight - 100;
         }
 
-        const t = {
-            id: i,
-            el,
-            x: posicaox,
-            y: posicaoy,
-            speed: 2,
-            alive: true,
-            cooldown: false,
-            ammo: 4,
-            score: 0,
-            controls: getSavedControls()[i],
-            angle: 0,
-            turretAngle: 0,
-        };
+        let t;
+
+        if (tankType == 1) {
+            t = {
+                id: i,
+                vida: 100,
+                el,
+                x: posicaox,
+                y: posicaoy,
+                speed: 2,
+                alive: true,
+                cooldown: false,
+                ammo: 4,
+                score: 0,
+                controls: getSavedControls()[i],
+                angle: 0,
+                turretAngle: 0,
+                reload: 2000,
+                slowed: false,
+            };
+        }
+
+        if (tankType == 2) {
+            t = {
+                id: i,
+                vida: 80,
+                el,
+                x: posicaox,
+                y: posicaoy,
+                speed: 2,
+                alive: true,
+                cooldown: false,
+                ammo: 12,
+                score: 0,
+                controls: getSavedControls()[i],
+                angle: 0,
+                turretAngle: 0,
+                reload: 800,
+                slowed: false,
+            };
+        }
 
         el.style.left = t.x + "px";
         el.style.top = t.y + "px";
@@ -358,8 +386,8 @@ function startMatch(players, bots = 0) {
 }
 
 function createBot(id) {
-    posicaobotx = 100;
-    posicaoboty = 120;
+    let posicaobotx = 100;
+    let posicaoboty = 120;
     const el = createTankEl("gray");
     body.appendChild(el);
 
@@ -381,6 +409,7 @@ function createBot(id) {
 
     const bot = {
         id: id,
+        vida: 100,
         el,
 
         x: posicaobotx,
@@ -507,26 +536,6 @@ function moveBot(t) {
     const dist = Math.hypot(dx, dy);
 
     const DISTANCIA_BOA = 180;
-
-    // =========================
-    // MOVIMENTO
-    // =========================
-    let moveX = 0;
-    let moveY = 0;
-
-    if (dist > DISTANCIA_BOA) {
-        moveX = Math.cos(t.angle) * t.speed;
-        moveY = Math.sin(t.angle) * t.speed;
-    } else if (dist < 100) {
-        moveX = -Math.cos(t.angle) * t.speed * 0.6;
-        moveY = -Math.sin(t.angle) * t.speed * 0.6;
-    }
-
-    let newXbot = t.x + moveX;
-    let newYbot = t.y + moveY;
-
-    if (!isColliding(newXbot, t.y)) t.x = newXbot;
-    if (!isColliding(t.x, newYbot)) t.y = newYbot;
 
     // =========================
     // TIRO
@@ -704,7 +713,7 @@ function shoot(t) {
 
     setTimeout(() => {
         t.cooldown = false;
-    }, RELOAD_TIME);
+    }, t.reload);
 
     const bulletEl = document.createElement("div");
 
@@ -723,21 +732,40 @@ function shoot(t) {
 
     const speed = 6;
 
-    const b = {
-        el: bulletEl,
-        x: spawnX,
-        y: spawnY,
-        vx: Math.cos(t.turretAngle) * speed,
-        vy: Math.sin(t.turretAngle) * speed,
-        owner: t,
-        life: 0, // tempo atual
-        maxLife: 80, // duração (frames)
-    };
+    let b;
+
+    if (tankType == 1) {
+        b = {
+            el: bulletEl,
+            damage: 50,
+            x: spawnX,
+            y: spawnY,
+            vx: Math.cos(t.turretAngle) * speed,
+            vy: Math.sin(t.turretAngle) * speed,
+            owner: t,
+            life: 0,
+            maxLife: 80,
+        };
+    }
+
+    if (tankType == 2) {
+        b = {
+            el: bulletEl,
+            damage: 20,
+            x: spawnX,
+            y: spawnY,
+            vx: Math.cos(t.turretAngle) * speed,
+            vy: Math.sin(t.turretAngle) * speed,
+            owner: t,
+            life: 0,
+            maxLife: 80,
+        };
+    }
+
+    bullets.push(b);
 
     bulletEl.style.left = spawnX + "px";
     bulletEl.style.top = spawnY + "px";
-
-    bullets.push(b);
 }
 
 // =========================
@@ -790,11 +818,20 @@ function updateBullets() {
 
             if (hit) {
                 b.el.remove();
-                b.owner.score++;
-                t.alive = false;
-                t.loot = t.ammo;
-                t.el.style.filter = "grayscale(100%)";
-                tocarSom(explosaoSom);
+                t.vida -= b.damage;
+                if (t.vida <= 30 && !t.slowed) {
+                    t.speed /= 2;
+                    t.slowed = true;
+                    t.el.style.filter = "grayscale(50%)";
+                }
+
+                if (t.vida <= 0) {
+                    t.alive = false;
+                    b.owner.score++;
+                    t.loot = t.ammo;
+                    t.el.style.filter = "grayscale(100%)";
+                    tocarSom(explosaoSom);
+                }
                 createExplosion(t.x, t.y);
 
                 checkWin();

@@ -91,24 +91,53 @@ document.addEventListener("keyup", (e) => {
 // MODE
 // =========================
 function verMode() {
-    choice.style.display = "none";
-    game.style.display = "block";
-
     clearGame();
 
-    if (mode === 1) {
-        if (botsNumber > 0) {
-            startMatch(1, botsNumber);
-        } else {
-            startMatch(1, 1);
+    choice.childNodes[1].childNodes[1].innerText = "Tanque tipo 1";
+    choice.childNodes[1].childNodes[3].innerText = "Tanque tipo 2";
+    choice.removeChild(choice.children[1]);
+    choice.children[0].style.height = "100dvh";
+
+    choice.children[0].children[0].onclick = function () {
+        tankType = 1;
+
+        if (mode === 1) {
+            if (botsNumber > 0) {
+                startMatch(1, botsNumber);
+            } else {
+                startMatch(1, 1);
+            }
+        } else if (mode === 2) {
+            startMatch(2, botsNumber);
+        } else if (mode === 3) {
+            startMatch(3, botsNumber);
+        } else if (mode === 4) {
+            startMatch(4, botsNumber);
         }
-    } else if (mode === 2) {
-        startMatch(2, botsNumber);
-    } else if (mode === 3) {
-        startMatch(3, botsNumber);
-    } else if (mode === 4) {
-        startMatch(4, botsNumber);
-    }
+
+        choice.style.display = "none";
+        game.style.display = "block";
+    };
+    choice.children[0].children[1].onclick = function () {
+        tankType = 2;
+
+        if (mode === 1) {
+            if (botsNumber > 0) {
+                startMatch(1, botsNumber);
+            } else {
+                startMatch(1, 1);
+            }
+        } else if (mode === 2) {
+            startMatch(2, botsNumber);
+        } else if (mode === 3) {
+            startMatch(3, botsNumber);
+        } else if (mode === 4) {
+            startMatch(4, botsNumber);
+        }
+
+        choice.style.display = "none";
+        game.style.display = "block";
+    };
 }
 
 // =========================

@@ -950,9 +950,10 @@ function createPowerUp(power) {
     const item = document.createElement("div");
 
     item.style.position = "absolute";
-    item.style.width = "20px";
-    item.style.height = "20px";
-    item.style.border = "1px solid red";
+    item.style.width = "40px";
+    item.style.height = "40px";
+    item.style.background = 'orange'
+    item.style.borderRadius = '8px'
 
     const x = Math.random() * (window.innerWidth - 20);
     const y = Math.random() * (window.innerHeight - 20);

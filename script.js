@@ -767,9 +767,11 @@ function shoot(t, robo) {
 
     const speed = 6;
 
+    let eRobo = robo || false
+
     let b;
 
-    if (robo == false) {
+    if (eRobo == false) {
         if (tankType == 1) {
             b = {
                 el: bulletEl,
@@ -809,6 +811,7 @@ function shoot(t, robo) {
             life: 0,
             maxLife: 80,
         };
+        console.log('rodo aq')
     }
 
     bullets.push(b);

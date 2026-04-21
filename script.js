@@ -14,6 +14,8 @@ let walls = [];
 let tanks = [];
 let bullets = [];
 let keys = {};
+let powerUps = ["speed", "ammo", "health"];
+let powerUpItems = [];
 let gameOver = false;
 let botsNumber = parseInt(localStorage.getItem("bots")) || 0;
 let showHitbox = false; // SEMPRE FALSE
@@ -375,6 +377,7 @@ function startMatch(players, bots = 0) {
                 turretAngle: 0,
                 reload: 2000,
                 slowed: false,
+                ammoType: 1,
             };
         }
 
@@ -385,7 +388,7 @@ function startMatch(players, bots = 0) {
                 el,
                 x: posicaox,
                 y: posicaoy,
-                speed: 2,
+                speed: 2.5,
                 alive: true,
                 cooldown: false,
                 ammo: 12,
@@ -395,6 +398,7 @@ function startMatch(players, bots = 0) {
                 turretAngle: 0,
                 reload: 800,
                 slowed: false,
+                ammoType: 2,
             };
         }
 
@@ -444,13 +448,15 @@ function createBot(id) {
         x: posicaobotx,
         y: posicaoboty - 100,
 
-        speed: 0.85,
+        speed: 1.5,
         accuracy: Math.random(),
         reaction: 800 + Math.random() * 1200,
 
         alive: true,
         cooldown: false,
+        reload: 2000,
         ammo: 4,
+        ammoType: 1,
 
         angle: Math.random() * Math.PI * 2,
         turretAngle: Math.random() * Math.PI * 2,
@@ -573,7 +579,7 @@ function moveBot(t) {
     const ALCANCE_TIRO = 400;
 
     if (dist < ALCANCE_TIRO && alinhado && agora - t.lastShot > t.reaction) {
-        shoot(t);
+        shoot(t, t.isBot);
         t.lastShot = agora;
     }
 
@@ -728,7 +734,7 @@ function moveTank(t) {
     }
 }
 
-function shoot(t) {
+function shoot(t, robo) {
     if (!t.alive || gameOver) {
         return;
     } else if (t.cooldown || t.ammo < 1) {
@@ -763,24 +769,38 @@ function shoot(t) {
 
     let b;
 
-    if (tankType == 1) {
+    if (robo == false) {
+        if (tankType == 1) {
+            b = {
+                el: bulletEl,
+                damage: 50,
+                x: spawnX,
+                y: spawnY,
+                vx: Math.cos(t.turretAngle) * speed,
+                vy: Math.sin(t.turretAngle) * speed,
+                owner: t,
+                life: 0,
+                maxLife: 80,
+            };
+        }
+
+        if (tankType == 2) {
+            b = {
+                el: bulletEl,
+                damage: 20,
+                x: spawnX,
+                y: spawnY,
+                vx: Math.cos(t.turretAngle) * speed,
+                vy: Math.sin(t.turretAngle) * speed,
+                owner: t,
+                life: 0,
+                maxLife: 80,
+            };
+        }
+    } else {
         b = {
             el: bulletEl,
             damage: 50,
-            x: spawnX,
-            y: spawnY,
-            vx: Math.cos(t.turretAngle) * speed,
-            vy: Math.sin(t.turretAngle) * speed,
-            owner: t,
-            life: 0,
-            maxLife: 80,
-        };
-    }
-
-    if (tankType == 2) {
-        b = {
-            el: bulletEl,
-            damage: 20,
             x: spawnX,
             y: spawnY,
             vx: Math.cos(t.turretAngle) * speed,
@@ -859,6 +879,7 @@ function updateBullets() {
                     b.owner.score++;
                     t.loot = t.ammo;
                     t.el.style.filter = "grayscale(100%)";
+                    t.el.style.zIndex = '-1'
                     tocarSom(explosaoSom);
                 }
                 createExplosion(t.x, t.y);
@@ -888,7 +909,7 @@ function checkLoot() {
                     p.y < t.y + TANK_SIZE &&
                     p.y + TANK_SIZE > t.y;
 
-                if (pegou) {
+                if (pegou && t.ammoType == p.ammoType) {
                     p.ammo = Math.min(p.ammo + t.loot, 30); //limite
                     t.loot = 0;
 
@@ -916,6 +937,69 @@ function checkWin() {
     }
 }
 
+function addPowerUps() {
+    chance = Math.round(Math.random() * 500);
+    if (chance == 1) {
+        powerUpRoleta = Math.round(Math.random() * 3);
+        powerUp = powerUps[powerUpRoleta];
+        createPowerUp(powerUp);
+    }
+}
+
+function createPowerUp(power) {
+    const item = document.createElement("div");
+
+    item.style.position = "absolute";
+    item.style.width = "20px";
+    item.style.height = "20px";
+    item.style.border = "1px solid red";
+
+    const x = Math.random() * (window.innerWidth - 20);
+    const y = Math.random() * (window.innerHeight - 20);
+
+    item.style.left = x + "px";
+    item.style.top = y + "px";
+
+    body.appendChild(item);
+
+    // salva no array
+    powerUpItems.push({
+        el: item,
+        x: x,
+        y: y,
+        type: power,
+    });
+}
+
+function checkColetou() {
+    powerUpItems = powerUpItems.filter((item) => {
+        for (const t of tanks) {
+            if (!t.alive) continue;
+
+            const pegou =
+                t.x < item.x + 20 &&
+                t.x + TANK_SIDE > item.x &&
+                t.y < item.y + 20 &&
+                t.y + TANK_SIZE > item.y;
+
+            if (pegou) {
+                item.el.remove();
+
+                if (item.type == "speed") {
+                    t.speed += 0.5;
+                } else if (item.type == "health") {
+                    t.vida += 10;
+                } else {
+                    t.ammo += 2;
+                }
+
+                return false; // remove da lista
+            }
+        }
+        return true;
+    });
+}
+
 // =========================
 // LOOP
 // =========================
@@ -931,6 +1015,8 @@ function loop() {
     checkLoot();
     updateBullets();
     updateHUD();
+    addPowerUps();
+    checkColetou();
 
     if (!gameOver) {
         requestAnimationFrame(loop);

@@ -417,7 +417,7 @@ function startMatch(players, bots = 0) {
                 turretAngle: 0,
                 reload: 2500,
                 slowed: false,
-                ammoType: 2,
+                ammoType: 3,
                 turretSpeed: 0.05,
             };
         }

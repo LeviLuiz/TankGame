@@ -69,6 +69,13 @@
     display: none;
 }
 
+#choice {
+    & h1 {
+        text-align: center;
+        display: none;
+    }
+}
+
 .div-choice {
     display: flex;
     height: 50dvh;

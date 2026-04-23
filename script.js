@@ -9,9 +9,9 @@ const clickSom = new Audio("click.mp3");
 const linhas = choice.children;
 
 let mode = 0;
-let tankType = 2;
 
 let walls = [];
+let playerTankTypes = [1, 1, 1, 1];
 let tanks = [];
 let bullets = [];
 let keys = {};
@@ -93,32 +93,46 @@ document.addEventListener("keyup", (e) => {
 // =========================
 // MODE
 // =========================
+player = 0;
 function verMode() {
+    if (player >= mode) {
+        startGame();
+        return;
+    }
     clearGame();
 
-    linhas[0].children[0].children[0].innerHTML = "Tanque tipo 1";
-    linhas[0].children[0].children[1].style.display = "block";
-    linhas[0].children[1].children[0].innerHTML = "Tanque tipo 2";
-    linhas[0].children[1].children[1].style.display = "block";
-    linhas[1].children[0].children[0].innerHTML = "Tanque tipo 3";
+    linhas[0].style.display = "block";
+    linhas[0].innerHTML = "Player " + (player + 1);
+
+    linhas[1].children[0].children[0].innerHTML = "Tanque tipo 1";
+    linhas[1].children[1].children[0].innerHTML = "Tanque tipo 2";
+    linhas[2].children[0].children[0].innerHTML = "Tanque tipo 3";
+
     linhas[1].children[0].children[1].style.display = "block";
+    linhas[1].children[1].children[1].style.display = "block";
+    linhas[2].children[0].children[1].style.display = "block";
 
-    linhas[1].removeChild(linhas[1].children[1]);
 
-    linhas[0].children[0].onclick = function () {
-        tankType = 1;
-        startGame();
-    };
-
-    linhas[0].children[1].onclick = function () {
-        tankType = 2;
-        startGame();
-    };
+    if (player < 1) {
+        linhas[2].removeChild(linhas[2].children[1]);
+    }
 
     linhas[1].children[0].onclick = function () {
-        tankType = 3;
-        startGame();
+        playerTankTypes[player - 1] = 1;
+        linhas[0].innerHTML = 'Player' + player
+        verMode();
     };
+
+    linhas[1].children[1].onclick = function () {
+        playerTankTypes[player - 1] = 2;
+        verMode();
+    };
+
+    linhas[2].children[0].onclick = function () {
+        playerTankTypes[player - 1] = 3;
+        verMode();
+    };
+    player += 1;
 }
 
 function startGame() {
@@ -358,7 +372,9 @@ function startMatch(players, bots = 0) {
 
         let t;
 
-        if (tankType == 1) {
+        const type = playerTankTypes[i];
+
+        if (type == 1) {
             t = {
                 id: i,
                 vida: 100,
@@ -380,7 +396,7 @@ function startMatch(players, bots = 0) {
             };
         }
 
-        if (tankType == 2) {
+        if (type == 2) {
             t = {
                 id: i,
                 vida: 80,
@@ -402,7 +418,7 @@ function startMatch(players, bots = 0) {
             };
         }
 
-        if (tankType == 3) {
+        if (type == 3) {
             t = {
                 id: i,
                 vida: 150,
@@ -794,7 +810,7 @@ function shoot(t, robo) {
     let b;
 
     if (eRobo == false) {
-        if (tankType == 1) {
+        if (t.ammoType == 1) {
             b = {
                 el: bulletEl,
                 damage: 50,
@@ -808,7 +824,7 @@ function shoot(t, robo) {
             };
         }
 
-        if (tankType == 2) {
+        if (t.ammoType == 2) {
             b = {
                 el: bulletEl,
                 damage: 20,
@@ -822,7 +838,7 @@ function shoot(t, robo) {
             };
         }
 
-        if (tankType == 3) {
+        if (t.ammoType == 3) {
             b = {
                 el: bulletEl,
                 damage: 60,
@@ -1118,9 +1134,12 @@ function loop() {
         }
 
         if (t.vida > 30) {
-        t.speed = 2;
-        t.slowed = false;
-        t.el.style.filter = "grayscale(0%)";
+            t.slowed = false;
+            t.el.style.filter = "grayscale(0%)";
+
+            if (t.ammoType == 1) t.speed = 2;
+            if (t.ammoType == 2) t.speed = 2.5;
+            if (t.ammoType == 3) t.speed = 1.5;
         }
     });
 

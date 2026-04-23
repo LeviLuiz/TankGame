@@ -74,11 +74,15 @@
     height: 50dvh;
     align-items: center;
     justify-content: space-around;
+
+    & div {
+        display: none;
+    }
 }
 
 .choice {
-    height: 30px;
-    width: 100px;
+    padding: 10px;
+    width: 120px;
     border-radius: 5px;
     border: 1px solid black;
     cursor: pointer;

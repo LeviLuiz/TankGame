@@ -6,6 +6,7 @@ const scoreScreen = document.getElementById("scoreScreen");
 const tiroSom = new Audio("disparo.mp3");
 const explosaoSom = new Audio("explosao.mp3");
 const clickSom = new Audio("click.mp3");
+const linhas = choice.children;
 
 let mode = 0;
 let tankType = 2;
@@ -95,11 +96,12 @@ document.addEventListener("keyup", (e) => {
 function verMode() {
     clearGame();
 
-    const linhas = choice.children;
-
-    linhas[0].children[0].innerText = "Tanque tipo 1";
-    linhas[0].children[1].innerText = "Tanque tipo 2";
-    linhas[1].children[0].innerText = "Tanque tipo 3";
+    linhas[0].children[0].children[0].innerHTML = "Tanque tipo 1";
+    linhas[0].children[0].children[1].style.display = "block";
+    linhas[0].children[1].children[0].innerHTML = "Tanque tipo 2";
+    linhas[0].children[1].children[1].style.display = "block";
+    linhas[1].children[0].children[0].innerHTML = "Tanque tipo 3";
+    linhas[1].children[0].children[1].style.display = "block";
 
     linhas[1].removeChild(linhas[1].children[1]);
 

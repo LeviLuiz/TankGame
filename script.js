@@ -95,51 +95,47 @@ document.addEventListener("keyup", (e) => {
 function verMode() {
     clearGame();
 
-    choice.childNodes[1].childNodes[1].innerText = "Tanque tipo 1";
-    choice.childNodes[1].childNodes[3].innerText = "Tanque tipo 2";
-    choice.removeChild(choice.children[1]);
-    choice.children[0].style.height = "100dvh";
+    const linhas = choice.children;
 
-    choice.children[0].children[0].onclick = function () {
+    linhas[0].children[0].innerText = "Tanque tipo 1";
+    linhas[0].children[1].innerText = "Tanque tipo 2";
+    linhas[1].children[0].innerText = "Tanque tipo 3";
+
+    linhas[1].removeChild(linhas[1].children[1]);
+
+    linhas[0].children[0].onclick = function () {
         tankType = 1;
-
-        if (mode === 1) {
-            if (botsNumber > 0) {
-                startMatch(1, botsNumber);
-            } else {
-                startMatch(1, 1);
-            }
-        } else if (mode === 2) {
-            startMatch(2, botsNumber);
-        } else if (mode === 3) {
-            startMatch(3, botsNumber);
-        } else if (mode === 4) {
-            startMatch(4, botsNumber);
-        }
-
-        choice.style.display = "none";
-        game.style.display = "block";
+        startGame();
     };
-    choice.children[0].children[1].onclick = function () {
+
+    linhas[0].children[1].onclick = function () {
         tankType = 2;
-
-        if (mode === 1) {
-            if (botsNumber > 0) {
-                startMatch(1, botsNumber);
-            } else {
-                startMatch(1, 1);
-            }
-        } else if (mode === 2) {
-            startMatch(2, botsNumber);
-        } else if (mode === 3) {
-            startMatch(3, botsNumber);
-        } else if (mode === 4) {
-            startMatch(4, botsNumber);
-        }
-
-        choice.style.display = "none";
-        game.style.display = "block";
+        startGame();
     };
+
+    linhas[1].children[0].onclick = function () {
+        tankType = 3;
+        startGame();
+    };
+}
+
+function startGame() {
+    if (mode === 1) {
+        if (botsNumber > 0) {
+            startMatch(1, botsNumber);
+        } else {
+            startMatch(1, 1);
+        }
+    } else if (mode === 2) {
+        startMatch(2, botsNumber);
+    } else if (mode === 3) {
+        startMatch(3, botsNumber);
+    } else if (mode === 4) {
+        startMatch(4, botsNumber);
+    }
+
+    choice.style.display = "none";
+    game.style.display = "block";
 }
 
 // =========================
@@ -378,6 +374,7 @@ function startMatch(players, bots = 0) {
                 reload: 2000,
                 slowed: false,
                 ammoType: 1,
+                turretSpeed: 0.07,
             };
         }
 
@@ -399,6 +396,29 @@ function startMatch(players, bots = 0) {
                 reload: 800,
                 slowed: false,
                 ammoType: 2,
+                turretSpeed: 0.1,
+            };
+        }
+
+        if (tankType == 3) {
+            t = {
+                id: i,
+                vida: 150,
+                el,
+                x: posicaox,
+                y: posicaoy,
+                speed: 1.5,
+                alive: true,
+                cooldown: false,
+                ammo: 5,
+                score: 0,
+                controls: getSavedControls()[i],
+                angle: 0,
+                turretAngle: 0,
+                reload: 2500,
+                slowed: false,
+                ammoType: 2,
+                turretSpeed: 0.05,
             };
         }
 
@@ -460,6 +480,7 @@ function createBot(id) {
 
         angle: Math.random() * Math.PI * 2,
         turretAngle: Math.random() * Math.PI * 2,
+        turretSpeed: 0.07,
 
         score: 0,
 
@@ -679,7 +700,6 @@ function moveTank(t) {
 
     const ROT_SPEED = 0.05;
     const MOVE_SPEED = t.speed;
-    const TURRET_SPEED = 0.07;
 
     let newX = t.x;
     let newY = t.y;
@@ -710,11 +730,11 @@ function moveTank(t) {
 
     // torre
     if (keys[t.controls.turretLeft]) {
-        t.turretAngle -= TURRET_SPEED;
+        t.turretAngle -= t.turretSpeed;
     }
 
     if (keys[t.controls.turretRight]) {
-        t.turretAngle += TURRET_SPEED;
+        t.turretAngle += t.turretSpeed;
     }
 
     // limites da tela
@@ -796,7 +816,21 @@ function shoot(t, robo) {
                 vy: Math.sin(t.turretAngle) * speed,
                 owner: t,
                 life: 0,
-                maxLife: 80,
+                maxLife: 90,
+            };
+        }
+
+        if (tankType == 3) {
+            b = {
+                el: bulletEl,
+                damage: 60,
+                x: spawnX,
+                y: spawnY,
+                vx: Math.cos(t.turretAngle) * speed,
+                vy: Math.sin(t.turretAngle) * speed,
+                owner: t,
+                life: 0,
+                maxLife: 75,
             };
         }
     } else {
@@ -1021,7 +1055,6 @@ function checkColision() {
             if (!t1.alive || !t2.alive) continue;
 
             if (isCollidingTanks(t1, t2)) {
-                console.log(`Colisão entre P${t1.id} e P${t2.id}`);
                 t1.x -= Math.cos(t1.angle) * 2;
                 t1.y -= Math.sin(t1.angle) * 2;
 
@@ -1030,16 +1063,42 @@ function checkColision() {
 
                 t1.vida -= 1;
                 t2.vida -= 1;
+                if (t1.vida <= 30 && !t1.slowed) {
+                    t1.speed /= 2;
+                    t1.slowed = true;
+                    t1.el.style.filter = "grayscale(50%)";
+                } else {
+                    t1.speed = t1.speed;
+                    t1.slowed = false;
+                    t1.el.style.filter = "grayscale(0%)";
+                }
+                if (t2.vida <= 30 && !t2.slowed) {
+                    t2.speed /= 2;
+                    t2.slowed = true;
+                    t2.el.style.filter = "grayscale(50%)";
+                } else {
+                    t2.speed = t2.speed;
+                    t2.slowed = false;
+                    t2.el.style.filter = "grayscale(0%)";
+                }
                 if (t1.vida <= 0) {
                     t1.alive = false;
-                    tocarSom(explosaoSom)
+                    tocarSom(explosaoSom);
                     createExplosion(t1.x, t1.y);
+                    t1.alive = false;
+                    t1.loot = t1.ammo;
+                    t2.score++;
                 }
                 if (t2.vida <= 0) {
                     t2.alive = false;
-                    tocarSom(explosaoSom)
+                    tocarSom(explosaoSom);
                     createExplosion(t2.x, t2.y);
+                    t2.alive = false;
+                    t2.loot = t2.ammo;
+                    t1.score++;
                 }
+
+                checkWin();
             }
         }
     }
@@ -1054,6 +1113,12 @@ function loop() {
             moveBot(t);
         } else {
             moveTank(t);
+        }
+
+        if (t.vida > 30) {
+        t.speed = 2;
+        t.slowed = false;
+        t.el.style.filter = "grayscale(0%)";
         }
     });
 

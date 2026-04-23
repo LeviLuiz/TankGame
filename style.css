@@ -24,6 +24,20 @@
     }
 }
 
+.version {
+    padding: 3px;
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    border-radius: 5px;
+    border: 1px solid gray;
+    transition: all 200ms;
+
+    &:hover {
+        background-color: #c0c0c0;
+    }
+}
+
 #overlay {
     position: fixed;
     inset: 0;

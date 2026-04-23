@@ -1,3 +1,5 @@
+const version = '1.0'
+document.getElementById('versionText').innerHTML = version
 const body = document.body;
 
 const choice = document.getElementById("choice");

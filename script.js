@@ -54,6 +54,8 @@ if (isMobile()) {
     linhas[1].children[1].style.display = 'none'
     linhas[2].children[0].style.display = 'none'
     linhas[1].style.height = '100dvh'
+
+    document.getElementById("configScreen").children[4].style.display = 'none'
 }
 
 // =========================

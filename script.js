@@ -22,6 +22,8 @@ let powerUpItems = [];
 let gameOver = false;
 let botsNumber = parseInt(localStorage.getItem("bots")) || 0;
 let showHitbox = false; // SEMPRE FALSE
+let posicaobotx = 0
+let posicaoboty = 0
 
 const slider = document.getElementById("botsConfig");
 const label = document.getElementById("botsNumber");
@@ -51,11 +53,14 @@ function tocarSom(audio) {
 
 if (isMobile()) {
     linhas[2].removeChild(linhas[2].children[1]);
-    linhas[1].children[1].style.display = 'none'
-    linhas[2].children[0].style.display = 'none'
-    linhas[1].style.height = '100dvh'
+    linhas[1].children[1].style.display = "none";
+    linhas[2].children[0].style.display = "none";
+    linhas[1].style.height = "100dvh";
 
-    document.getElementById("configScreen").children[4].style.display = 'none'
+    document.getElementById("configScreen").children[4].style.display = "none";
+
+    posicaobotx = window.innerWidth - 90
+    posicaoboty = window.innerHeight
 }
 
 // =========================
@@ -103,9 +108,11 @@ document.addEventListener("keyup", (e) => {
 
 function isMobile() {
     return (
-        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
-        || window.innerWidth <= 900
-        || "ontouchstart" in window
+        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
+            navigator.userAgent,
+        ) ||
+        window.innerWidth <= 900 ||
+        "ontouchstart" in window
     );
 }
 // =========================
@@ -125,7 +132,7 @@ function verMode() {
     linhas[1].children[0].style.display = "block";
     linhas[1].children[1].style.display = "block";
     linhas[2].children[0].style.display = "block";
-    linhas[1].style.height = '50dvh'
+    linhas[1].style.height = "50dvh";
 
     linhas[1].children[0].children[0].innerHTML = "Tanque tipo 1";
     linhas[1].children[1].children[0].innerHTML = "Tanque tipo 2";
@@ -175,7 +182,7 @@ function startGame() {
     choice.style.display = "none";
     game.style.display = "block";
     if (isMobile()) {
-        document.getElementById('mobileButtons').style.display = 'block'
+        document.getElementById("mobileButtons").style.display = "block";
     }
 }
 
@@ -482,14 +489,18 @@ function startMatch(players, bots = 0) {
 }
 
 function createBot(id) {
-    let posicaobotx = 100;
-    let posicaoboty = 120;
+    if (posicaobotx < 1) {
+        let posicaobotx = 100;
+        let posicaoboty = 120;
+    }
     const el = createTankEl("gray");
     body.appendChild(el);
 
     if (id == 1) {
+        if (!isMobile()) {
         posicaobotx = 50;
         posicaoboty = window.innerHeight - 50;
+        }
     } else if (id == 2) {
         posicaobotx = window.innerWidth - posicaobotx;
     } else if (id == 3) {

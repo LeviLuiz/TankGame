@@ -1,5 +1,5 @@
-const version = '1.0.1'
-document.getElementById('versionText').innerHTML = version
+const version = "1.0.2";
+document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
 const choice = document.getElementById("choice");
@@ -114,14 +114,13 @@ function verMode() {
     linhas[1].children[1].children[1].style.display = "block";
     linhas[2].children[0].children[1].style.display = "block";
 
-
     if (player < 1) {
         linhas[2].removeChild(linhas[2].children[1]);
     }
 
     linhas[1].children[0].onclick = function () {
         playerTankTypes[player - 1] = 1;
-        linhas[0].innerHTML = 'Player' + player
+        linhas[0].innerHTML = "Player" + player;
         verMode();
     };
 
@@ -1087,8 +1086,8 @@ function checkColision() {
                     t1.speed /= 2;
                     t1.slowed = true;
                     t1.el.style.filter = "grayscale(50%)";
-                } else {
-                    t1.speed = t1.speed;
+                }
+                if (t1.vida > 30) {
                     t1.slowed = false;
                     t1.el.style.filter = "grayscale(0%)";
                 }
@@ -1096,8 +1095,8 @@ function checkColision() {
                     t2.speed /= 2;
                     t2.slowed = true;
                     t2.el.style.filter = "grayscale(50%)";
-                } else {
-                    t2.speed = t2.speed;
+                }
+                if (t2.vida > 30) {
                     t2.slowed = false;
                     t2.el.style.filter = "grayscale(0%)";
                 }

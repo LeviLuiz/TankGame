@@ -2,13 +2,25 @@
 <html lang="pt-BR">
     <head>
         <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
-        <link rel="stylesheet" href="style.css"/>
-        <link rel="icon" href="Logo.png">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+        <link
+            rel="stylesheet"
+            href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+        />
+        <link rel="stylesheet" href="style.css" />
+        <link rel="icon" href="Logo.png" />
         <title>Tank Game</title>
     </head>
     <body>
+        <div id="mobileButtons">
+            <div id="btnUp" class="btn">⮝</div>
+            <div id="btnLeft" class="btn">⮜</div>
+            <div id="btnRight" class="btn">⮞</div>
+            <div id="btnDown" class="btn">⮟</div>
+            <div id="torRight" class="btn">⮞</div>
+            <div id="torLeft" class="btn">⮜</div>
+            <div id="btnFire" class="btn"><i class="fa-solid fa-crosshairs" style="font-size: larger;"></i></div>
+        </div>
         <button id="config" onclick="openConfig()">
             <i class="fa-solid fa-gear"></i>
         </button>
@@ -68,7 +80,7 @@
             <button onclick="salvarConfig()">Salvar</button>
         </div>
         <div id="choice">
-            <h1>Player 0</h1>
+            <h1 style="width: 100%; position: absolute;">Player 0</h1>
             <div class="div-choice">
                 <button
                     class="choice"
@@ -77,14 +89,14 @@
                         verMode();
                     "
                 >
-                <h3>Singleplayer</h3>
-                <div>
-                    <br>
-                    <p class="caracteristicas">Vida: 100</p>
-                    <p class="caracteristicas">Munição: 4</p>
-                    <p class="caracteristicas">Recarga: 2</p>
-                    <p class="caracteristicas">Dano: 50</p>
-                </div>
+                    <h3>Singleplayer</h3>
+                    <div>
+                        <br />
+                        <p class="caracteristicas">Vida: 100</p>
+                        <p class="caracteristicas">Munição: 4</p>
+                        <p class="caracteristicas">Recarga: 2</p>
+                        <p class="caracteristicas">Dano: 50</p>
+                    </div>
                 </button>
                 <button
                     class="choice"
@@ -93,14 +105,14 @@
                         verMode();
                     "
                 >
-                <h3>2 Players</h3>
-                <div>
-                    <br>
-                    <p class="caracteristicas">Vida: 80</p>
-                    <p class="caracteristicas">Munição: 12</p>
-                    <p class="caracteristicas">Recarga: 0.8</p>
-                    <p class="caracteristicas">Dano: 20</p>
-                </div>
+                    <h3>2 Players</h3>
+                    <div>
+                        <br />
+                        <p class="caracteristicas">Vida: 80</p>
+                        <p class="caracteristicas">Munição: 12</p>
+                        <p class="caracteristicas">Recarga: 0.8</p>
+                        <p class="caracteristicas">Dano: 20</p>
+                    </div>
                 </button>
             </div>
             <div class="div-choice">
@@ -111,14 +123,14 @@
                         verMode();
                     "
                 >
-                <h3>3 Players</h3>
-                <div>
-                    <br>
-                    <p class="caracteristicas">Vida: 150</p>
-                    <p class="caracteristicas">Munição: 5</p>
-                    <p class="caracteristicas">Recarga: 2.5</p>
-                    <p class="caracteristicas">Dano: 60</p>
-                </div>
+                    <h3>3 Players</h3>
+                    <div>
+                        <br />
+                        <p class="caracteristicas">Vida: 150</p>
+                        <p class="caracteristicas">Munição: 5</p>
+                        <p class="caracteristicas">Recarga: 2.5</p>
+                        <p class="caracteristicas">Dano: 60</p>
+                    </div>
                 </button>
                 <button
                     class="choice"
@@ -127,7 +139,7 @@
                         verMode();
                     "
                 >
-                <h3>4 Players</h3>                
+                    <h3>4 Players</h3>
                 </button>
             </div>
         </div>

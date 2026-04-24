@@ -4,6 +4,11 @@
     box-sizing: border-box;
 }
 
+body {
+    touch-action: none;
+    overflow: hidden;
+}
+
 #config {
     width: 30px;
     aspect-ratio: 1;
@@ -181,4 +186,47 @@
     aspect-ratio: 1;
     border-radius: 50%;
     display: none;
+}
+
+#mobileButtons {
+    display: none;
+}
+
+.btn {
+    position: fixed;
+    width: 60px;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    bottom: 40px;
+    user-select: none;
+    touch-action: none;
+    border: 1px solid gray;
+
+    transition: all 150ms;
+
+    &:active {
+        background-color: #cccccc;
+    }
+}
+
+#btnUp { left: 100px; bottom: 120px; }
+#btnLeft { left: 20px; bottom: 60px;}
+#btnRight { left: 180px; bottom: 60px;}
+#btnDown { left: 100px; bottom: 10px; }
+#torLeft { right: 170px; bottom: 60px;}
+#torRight { right: 10px; bottom: 60px;}
+#btnFire { right: 90px; bottom: 60px;}
+
+#mobileButtons {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+}
+
+#mobileButtons .btn {
+    pointer-events: auto;
 }

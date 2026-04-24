@@ -1,4 +1,4 @@
-const version = "1.0.2";
+const version = "1.1.0";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -49,6 +49,13 @@ function tocarSom(audio) {
     audio.play();
 }
 
+if (isMobile()) {
+    linhas[2].removeChild(linhas[2].children[1]);
+    linhas[1].children[1].style.display = 'none'
+    linhas[2].children[0].style.display = 'none'
+    linhas[1].style.height = '100dvh'
+}
+
 // =========================
 // INPUT
 // =========================
@@ -92,6 +99,13 @@ document.addEventListener("keyup", (e) => {
     keys[e.code] = false;
 });
 
+function isMobile() {
+    return (
+        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
+        || window.innerWidth <= 900
+        || "ontouchstart" in window
+    );
+}
 // =========================
 // MODE
 // =========================
@@ -106,6 +120,11 @@ function verMode() {
     linhas[0].style.display = "block";
     linhas[0].innerHTML = "Player " + (player + 1);
 
+    linhas[1].children[0].style.display = "block";
+    linhas[1].children[1].style.display = "block";
+    linhas[2].children[0].style.display = "block";
+    linhas[1].style.height = '50dvh'
+
     linhas[1].children[0].children[0].innerHTML = "Tanque tipo 1";
     linhas[1].children[1].children[0].innerHTML = "Tanque tipo 2";
     linhas[2].children[0].children[0].innerHTML = "Tanque tipo 3";
@@ -114,7 +133,7 @@ function verMode() {
     linhas[1].children[1].children[1].style.display = "block";
     linhas[2].children[0].children[1].style.display = "block";
 
-    if (player < 1) {
+    if (player < 1 && !isMobile()) {
         linhas[2].removeChild(linhas[2].children[1]);
     }
 
@@ -153,6 +172,9 @@ function startGame() {
 
     choice.style.display = "none";
     game.style.display = "block";
+    if (isMobile()) {
+        document.getElementById('mobileButtons').style.display = 'block'
+    }
 }
 
 // =========================
@@ -989,6 +1011,9 @@ function checkWin() {
             alert(`Jogador ${alive[0].id + 1} venceu!`);
             location.reload();
         }, 100);
+    } else if (alive.length === 0) {
+        alert(`O jogo Empatou`);
+        location.reload();
     }
 }
 
@@ -1167,3 +1192,31 @@ function salvarConfig() {
     document.getElementById("configScreen").style.display = "none";
     document.getElementById("overlay").style.display = "none";
 }
+
+// CONTROLES MOBILE
+
+function bindTouch(id, key) {
+    const el = document.getElementById(id);
+    if (!el) return;
+
+    el.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        keys[key] = true;
+    });
+
+    el.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        keys[key] = false;
+    });
+}
+
+bindTouch("btnUp", "KeyW");
+bindTouch("btnLeft", "KeyA");
+bindTouch("btnRight", "KeyD");
+bindTouch("btnDown", "KeyS");
+bindTouch("torRight", "KeyE");
+bindTouch("torLeft", "KeyQ");
+
+document.getElementById("btnFire").addEventListener("touchstart", () => {
+    shoot(tanks[0]);
+});

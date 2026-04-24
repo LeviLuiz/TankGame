@@ -994,8 +994,6 @@ function checkLoot() {
 
                     t.el.innerText = ""; // limpa texto
                     t.el.style.opacity = "0.3";
-
-                    console.log(`P${p.id + 1} pegou munição`);
                 }
             }
         }

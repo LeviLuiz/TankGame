@@ -586,18 +586,18 @@ function moveBot(t) {
 
     for (const b of bullets) {
         if (b.owner === t) continue;
-    
+
         const distBullet = Math.hypot(b.x - t.x, b.y - t.y);
-    
-        if (distBullet < 240) {
+
+        if (distBullet < 300) {
             const dodge = Math.atan2(t.y - b.y, t.x - b.x);
-        
+
             // gira 90° para lado da bala
             const dodgeAngle = dodge + Math.PI / 2;
-        
+
             let diff = dodgeAngle - t.angle;
             diff = Math.atan2(Math.sin(diff), Math.cos(diff));
-        
+
             t.angle += Math.sign(diff) * 0.08;
         }
     }
@@ -922,9 +922,9 @@ function shoot(t, robo) {
 }
 
 function die(t, b) {
-    t.alive = false
-    b.owner.score++
-    t.el.style.filter = 'grayscale(100%)'
+    t.alive = false;
+    b.owner.score++;
+    t.el.style.filter = "grayscale(100%)";
     tocarSom(explosaoSom);
     createExplosion(t.x, t.y);
     t.loot = t.ammo;
@@ -932,9 +932,9 @@ function die(t, b) {
 }
 
 function dieColision(t, t2) {
-    t.alive = false
-    t2.score++
-    t.el.style.filter = 'grayscale(100%)'
+    t.alive = false;
+    t2.score++;
+    t.el.style.filter = "grayscale(100%)";
     tocarSom(explosaoSom);
     createExplosion(t.x, t.y);
     t.loot = t.ammo;
@@ -999,7 +999,7 @@ function updateBullets() {
                 }
 
                 if (t.vida <= 0) {
-                    die(t, b)
+                    die(t, b);
                 }
                 createExplosion(t.x, t.y);
 
@@ -1107,11 +1107,41 @@ function checkColetou() {
                 item.el.remove();
 
                 if (item.type == "speed") {
-                    t.speed += 0.5;
+                    if (t.ammoType == 1) {
+                        t.speed = Math.min(t.speed + 0.5, 4);
+                    }
+
+                    if (t.ammoType == 2) {
+                        t.speed = Math.min(t.speed + 0.5, 5);
+                    }
+
+                    if (t.ammoType == 3) {
+                        t.speed = Math.min(t.speed + 0.5, 3);
+                    }
                 } else if (item.type == "health") {
-                    t.vida += 10;
-                } else {
-                    t.ammo += 2;
+                    if (t.ammoType == 1) {
+                        t.vida = Math.min(t.vida + 10, 100);
+                    }
+
+                    if (t.ammoType == 2) {
+                        t.vida = Math.min(t.vida + 10, 80);
+                    }
+
+                    if (t.ammoType == 3) {
+                        t.vida = Math.min(t.vida + 10, 150);
+                    }
+                } else if (item.type == "ammo") {
+                    if (t.ammoType == 1) {
+                        t.ammo = Math.min(t.ammo + 2, 12);
+                    }
+
+                    if (t.ammoType == 2) {
+                        t.ammo = Math.min(t.ammo + 4, 20);
+                    }
+
+                    if (t.ammoType == 3) {
+                        t.ammo = Math.min(t.ammo + 2, 10);
+                    }
                 }
 
                 return false; // remove da lista
@@ -1166,10 +1196,10 @@ function checkColision() {
                     t2.el.style.filter = "grayscale(0%)";
                 }
                 if (t1.vida <= 0) {
-                    dieColision(t1, t2)
+                    dieColision(t1, t2);
                 }
                 if (t2.vida <= 0) {
-                    dieColision(t2, t1)
+                    dieColision(t2, t1);
                 }
 
                 checkWin();

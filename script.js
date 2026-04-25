@@ -22,8 +22,8 @@ let powerUpItems = [];
 let gameOver = false;
 let botsNumber = parseInt(localStorage.getItem("bots")) || 0;
 let showHitbox = false; // SEMPRE FALSE
-let posicaobotx = 0
-let posicaoboty = 0
+let posicaobotx = 0;
+let posicaoboty = 0;
 
 const slider = document.getElementById("botsConfig");
 const label = document.getElementById("botsNumber");
@@ -59,8 +59,8 @@ if (isMobile()) {
 
     document.getElementById("configScreen").children[4].style.display = "none";
 
-    posicaobotx = window.innerWidth - 90
-    posicaoboty = window.innerHeight
+    posicaobotx = window.innerWidth - 90;
+    posicaoboty = window.innerHeight;
 }
 
 // =========================
@@ -124,7 +124,6 @@ function verMode() {
         startGame();
         return;
     }
-    clearGame();
 
     linhas[0].style.display = "block";
     linhas[0].innerHTML = "Player " + (player + 1);
@@ -184,18 +183,6 @@ function startGame() {
     if (isMobile()) {
         document.getElementById("mobileButtons").style.display = "block";
     }
-}
-
-// =========================
-// RESET
-// =========================
-function clearGame() {
-    tanks.forEach((t) => t.el.remove());
-    bullets.forEach((b) => b.el.remove());
-
-    tanks = [];
-    bullets = [];
-    gameOver = false;
 }
 
 function createWall(x, y, w, h) {
@@ -416,7 +403,7 @@ function startMatch(players, bots = 0) {
                 speed: 2,
                 alive: true,
                 cooldown: false,
-                ammo: 4,
+                ammo: 7,
                 score: 0,
                 controls: getSavedControls()[i],
                 angle: 0,
@@ -460,7 +447,7 @@ function startMatch(players, bots = 0) {
                 speed: 1.5,
                 alive: true,
                 cooldown: false,
-                ammo: 5,
+                ammo: 6,
                 score: 0,
                 controls: getSavedControls()[i],
                 angle: 0,
@@ -489,17 +476,17 @@ function startMatch(players, bots = 0) {
 }
 
 function createBot(id) {
-    if (posicaobotx < 1) {
-        let posicaobotx = 100;
-        let posicaoboty = 120;
+    if (!isMobile()) {
+        posicaobotx = 100;
+        posicaoboty = 120;
     }
     const el = createTankEl("gray");
     body.appendChild(el);
 
     if (id == 1) {
         if (!isMobile()) {
-        posicaobotx = 50;
-        posicaoboty = window.innerHeight - 50;
+            posicaobotx = 50;
+            posicaoboty = window.innerHeight - 50;
         }
     } else if (id == 2) {
         posicaobotx = window.innerWidth - posicaobotx;
@@ -529,7 +516,7 @@ function createBot(id) {
         alive: true,
         cooldown: false,
         reload: 2000,
-        ammo: 4,
+        ammo: 7,
         ammoType: 1,
 
         angle: Math.random() * Math.PI * 2,
@@ -575,8 +562,15 @@ function moveBot(t) {
 
     const target = t.target;
 
-    const dx = target.x - t.x;
-    const dy = target.y - t.y;
+    const prediction = 20;
+
+    const futureTargetX =
+        target.x + Math.cos(target.angle) * target.speed * prediction;
+    const futureTargetY =
+        target.y + Math.sin(target.angle) * target.speed * prediction;
+
+    const dx = futureTargetX - t.x;
+    const dy = futureTargetY - t.y;
 
     // =========================
     // TORRE (mira no alvo)
@@ -588,6 +582,24 @@ function moveBot(t) {
 
     if (Math.abs(turretDiff) > 0.02) {
         t.turretAngle += Math.sign(turretDiff) * 0.05;
+    }
+
+    for (const b of bullets) {
+        if (b.owner === t) continue;
+    
+        const distBullet = Math.hypot(b.x - t.x, b.y - t.y);
+    
+        if (distBullet < 240) {
+            const dodge = Math.atan2(t.y - b.y, t.x - b.x);
+        
+            // gira 90° para lado da bala
+            const dodgeAngle = dodge + Math.PI / 2;
+        
+            let diff = dodgeAngle - t.angle;
+            diff = Math.atan2(Math.sin(diff), Math.cos(diff));
+        
+            t.angle += Math.sign(diff) * 0.08;
+        }
     }
 
     // =========================
@@ -901,10 +913,32 @@ function shoot(t, robo) {
         };
     }
 
+    updateHUD();
+
     bullets.push(b);
 
     bulletEl.style.left = spawnX + "px";
     bulletEl.style.top = spawnY + "px";
+}
+
+function die(t, b) {
+    t.alive = false
+    b.owner.score++
+    t.el.style.filter = 'grayscale(100%)'
+    tocarSom(explosaoSom);
+    createExplosion(t.x, t.y);
+    t.loot = t.ammo;
+    t.el.style.zIndex = "-1";
+}
+
+function dieColision(t, t2) {
+    t.alive = false
+    t2.score++
+    t.el.style.filter = 'grayscale(100%)'
+    tocarSom(explosaoSom);
+    createExplosion(t.x, t.y);
+    t.loot = t.ammo;
+    t.el.style.zIndex = "-1";
 }
 
 // =========================
@@ -965,12 +999,7 @@ function updateBullets() {
                 }
 
                 if (t.vida <= 0) {
-                    t.alive = false;
-                    b.owner.score++;
-                    t.loot = t.ammo;
-                    t.el.style.filter = "grayscale(100%)";
-                    t.el.style.zIndex = "-1";
-                    tocarSom(explosaoSom);
+                    die(t, b)
                 }
                 createExplosion(t.x, t.y);
 
@@ -1137,23 +1166,14 @@ function checkColision() {
                     t2.el.style.filter = "grayscale(0%)";
                 }
                 if (t1.vida <= 0) {
-                    t1.alive = false;
-                    tocarSom(explosaoSom);
-                    createExplosion(t1.x, t1.y);
-                    t1.alive = false;
-                    t1.loot = t1.ammo;
-                    t2.score++;
+                    dieColision(t1, t2)
                 }
                 if (t2.vida <= 0) {
-                    t2.alive = false;
-                    tocarSom(explosaoSom);
-                    createExplosion(t2.x, t2.y);
-                    t2.alive = false;
-                    t2.loot = t2.ammo;
-                    t1.score++;
+                    dieColision(t2, t1)
                 }
 
                 checkWin();
+                updateHUD();
             }
         }
     }
@@ -1182,7 +1202,6 @@ function loop() {
 
     checkLoot();
     updateBullets();
-    updateHUD();
     addPowerUps();
     checkColetou();
     checkColision();

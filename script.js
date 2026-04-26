@@ -51,6 +51,16 @@ function tocarSom(audio) {
     audio.play();
 }
 
+async function forcarPaisagem() {
+    try {
+        await screen.orientation.lock("landscape");
+    } catch (e) {
+        console.log("Não foi possível travar a orientação:", e);
+    }
+}
+
+focarPaisagem()
+
 if (isMobile()) {
     linhas[2].removeChild(linhas[2].children[1]);
     linhas[1].children[1].style.display = "none";

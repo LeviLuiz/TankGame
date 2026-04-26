@@ -22,6 +22,7 @@ let powerUpItems = [];
 let gameOver = false;
 let botsNumber = parseInt(localStorage.getItem("bots")) || 0;
 let showHitbox = false; // SEMPRE FALSE
+let paused = false;
 let posicaobotx = 0;
 let posicaoboty = 0;
 
@@ -60,7 +61,7 @@ async function focarPaisagem() {
 }
 
 if (isMobile()) {
-    focarPaisagem()
+    focarPaisagem();
 
     linhas[1].children[1].style.display = "none";
     linhas[2].children[0].style.display = "none";
@@ -78,6 +79,7 @@ if (isMobile()) {
 document.addEventListener("keydown", (e) => {
     if (e.code === "KeyP") {
         showHitbox = !showHitbox;
+        paused = !paused;
     }
     // 👇 NOVO: captura tecla pra configurar
     if (waitingKey) {
@@ -573,27 +575,29 @@ function createBot(id) {
         posicaoboty = window.innerHeight / 2;
     }
 
+    let botType = Math.round(Math.random() * 3) + 1;
+
     const bot = {
         id: id,
-        vida: 100,
+        vida: tankTypes[botType].vida,
         el,
 
         x: posicaobotx,
         y: posicaoboty - 100,
 
-        speed: 1.5,
+        speed: tankTypes[botType].speed,
         accuracy: Math.random(),
         reaction: 800 + Math.random() * 1200,
 
         alive: true,
         cooldown: false,
-        reload: 2000,
-        ammo: 7,
-        ammoType: 1,
+        reload: tankTypes[botType].reload,
+        ammo: tankTypes[botType].ammo,
+        ammoType: tankTypes[botType].ammoType,
 
-        angle: Math.random() * Math.PI * 2,
-        turretAngle: Math.random() * Math.PI * 2,
-        turretSpeed: 0.07,
+        angle: 0,
+        turretAngle: 0,
+        turretSpeed: tankTypes[botType].turretSpeed,
 
         score: 0,
 
@@ -906,7 +910,7 @@ function shoot(t, robo) {
 
     setTimeout(() => {
         t.cooldown = false;
-        updateHUD()
+        updateHUD();
     }, t.reload);
 
     const bulletEl = document.createElement("div");
@@ -1155,10 +1159,10 @@ function addPowerUps() {
 
 function createPowerUp(power) {
     const item = document.createElement("div");
-    
-    if (power == 'speed') item.style.background = 'blue'
-    if (power == 'ammo') item.style.background = 'red'
-    if (power == 'health') item.style.background = 'green'
+
+    if (power == "speed") item.style.background = "blue";
+    if (power == "ammo") item.style.background = "red";
+    if (power == "health") item.style.background = "green";
     item.style.position = "absolute";
     item.style.width = "40px";
     item.style.height = "40px";
@@ -1207,6 +1211,10 @@ function checkColetou() {
                     if (t.ammoType == 3) {
                         t.speed = Math.min(t.speed + 0.5, 3);
                     }
+
+                    if (t.ammoType == 4) {
+                        t.speed = Math.min(t.speed + 0.5, 4.2);
+                    }
                 } else if (item.type == "health") {
                     if (t.ammoType == 1) {
                         t.vida = Math.min(t.vida + 10, 100);
@@ -1217,6 +1225,10 @@ function checkColetou() {
                     }
 
                     if (t.ammoType == 3) {
+                        t.vida = Math.min(t.vida + 10, 70);
+                    }
+
+                    if (t.ammoType == 4) {
                         t.vida = Math.min(t.vida + 10, 150);
                     }
                 } else if (item.type == "ammo") {
@@ -1231,9 +1243,14 @@ function checkColetou() {
                     if (t.ammoType == 3) {
                         t.ammo = Math.min(t.ammo + 2, 10);
                     }
+
+                    if (t.ammoType == 4) {
+                        t.ammo = Math.min(t.ammo + 4, 30);
+                    }
                 }
 
                 return false; // remove da lista
+                updateHUD()
             }
         }
         return true;
@@ -1302,6 +1319,14 @@ function checkColision() {
 // LOOP
 // =========================
 function loop() {
+    if (paused) {
+        requestAnimationFrame(loop);
+        tanks.forEach((t) => {
+            moveTank(t);
+        });
+        return;
+    }
+
     tanks.forEach((t) => {
         if (t.isBot) {
             moveBot(t);
@@ -1316,6 +1341,7 @@ function loop() {
             if (t.ammoType == 1) t.speed = 2;
             if (t.ammoType == 2) t.speed = 2.5;
             if (t.ammoType == 3) t.speed = 1.5;
+            if (t.ammoType == 4) t.speed = 2.7;
         }
     });
 

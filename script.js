@@ -46,12 +46,12 @@ function setControl(playerIndex, action) {
 }
 
 function tocarSom(audio) {
-    audio.volume = 0.5;
+    audio.volume = 0.3;
     audio.currentTime = 0;
     audio.play();
 }
 
-async function forcarPaisagem() {
+async function focarPaisagem() {
     try {
         await screen.orientation.lock("landscape");
     } catch (e) {
@@ -59,9 +59,9 @@ async function forcarPaisagem() {
     }
 }
 
-focarPaisagem()
-
 if (isMobile()) {
+    focarPaisagem()
+
     linhas[1].children[1].style.display = "none";
     linhas[2].children[0].style.display = "none";
     linhas[1].style.height = "100dvh";
@@ -152,10 +152,10 @@ const tankTypes = {
     4: {
         nome: "Tanque tipo 4",
         vida: 70,
-        speed: 3,
+        speed: 2.7,
         ammo: 30,
-        reload: 400,
-        turretSpeed: 0.05,
+        reload: 500,
+        turretSpeed: 0.08,
         damage: 10,
         ammoType: 4,
     },
@@ -266,6 +266,12 @@ function verMode() {
         playerTankTypes[player - 1] = 3;
         verMode();
     };
+
+    linhas[2].children[1].onclick = function () {
+        playerTankTypes[player - 1] = 4;
+        verMode();
+    };
+
     player += 1;
 }
 
@@ -900,6 +906,7 @@ function shoot(t, robo) {
 
     setTimeout(() => {
         t.cooldown = false;
+        updateHUD()
     }, t.reload);
 
     const bulletEl = document.createElement("div");
@@ -927,7 +934,7 @@ function shoot(t, robo) {
         if (t.ammoType == 1) {
             b = {
                 el: bulletEl,
-                damage: 50,
+                damage: tankTypes[1].damage,
                 x: spawnX,
                 y: spawnY,
                 vx: Math.cos(t.turretAngle) * speed,
@@ -941,7 +948,7 @@ function shoot(t, robo) {
         if (t.ammoType == 2) {
             b = {
                 el: bulletEl,
-                damage: 20,
+                damage: tankTypes[2].damage,
                 x: spawnX,
                 y: spawnY,
                 vx: Math.cos(t.turretAngle) * speed,
@@ -955,7 +962,21 @@ function shoot(t, robo) {
         if (t.ammoType == 3) {
             b = {
                 el: bulletEl,
-                damage: 60,
+                damage: tankTypes[3].damage,
+                x: spawnX,
+                y: spawnY,
+                vx: Math.cos(t.turretAngle) * speed,
+                vy: Math.sin(t.turretAngle) * speed,
+                owner: t,
+                life: 0,
+                maxLife: 75,
+            };
+        }
+
+        if (t.ammoType == 4) {
+            b = {
+                el: bulletEl,
+                damage: tankTypes[4].damage,
                 x: spawnX,
                 y: spawnY,
                 vx: Math.cos(t.turretAngle) * speed,
@@ -1135,9 +1156,9 @@ function addPowerUps() {
 function createPowerUp(power) {
     const item = document.createElement("div");
     
-    if (type == 'speed') item.style.background = 'blue'
-    if (type == 'ammo') item.style.background = 'red'
-    if (type == 'health') item.style.background = 'green'
+    if (power == 'speed') item.style.background = 'blue'
+    if (power == 'ammo') item.style.background = 'red'
+    if (power == 'health') item.style.background = 'green'
     item.style.position = "absolute";
     item.style.width = "40px";
     item.style.height = "40px";

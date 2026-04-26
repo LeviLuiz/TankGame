@@ -1,4 +1,4 @@
-const version = "1.2.0";
+const version = "1.2.1";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -58,19 +58,6 @@ async function focarPaisagem() {
     } catch (e) {
         console.log("Não foi possível travar a orientação:", e);
     }
-}
-
-if (isMobile()) {
-    focarPaisagem();
-
-    linhas[1].children[1].style.display = "none";
-    linhas[2].children[0].style.display = "none";
-    linhas[1].style.height = "100dvh";
-
-    document.getElementById("configScreen").children[4].style.display = "none";
-
-    posicaobotx = 40;
-    posicaoboty = window.innerHeight;
 }
 
 // =========================
@@ -172,6 +159,27 @@ function isMobile() {
         "ontouchstart" in window
     );
 }
+
+if (isMobile()) {
+    focarPaisagem();
+
+    linhas[1].children[1].style.display = "none";
+    linhas[2].children[0].style.display = "none";
+    linhas[1].style.height = "100dvh";
+
+    document.getElementById("configScreen").children[4].style.display = "none";
+
+    posicaobotx = window.innerWidth - 100;
+    posicaoboty = 150;
+
+    document.getElementById("botsConfig").max = 2;
+
+    for (i = 1; i <= 4; i++) {
+        tankTypes[i].speed /= 2;
+        tankTypes[i].reload = Math.round(tankTypes[i].reload * 1.5);
+    }
+}
+
 // =========================
 // MODE
 // =========================
@@ -323,9 +331,13 @@ function createMap() {
     createWall(window.innerWidth - 5, 0, 5, window.innerHeight);
 
     // obstáculos no meio
-    createWall(300, 200, 200, 40);
-    createWall(600, 400, 40, 200);
-    createWall(900, 150, 150, 40);
+    if (isMobile()) {
+        createWall((window.innerWidth - 250), 130, 200, 40);
+    } else {
+        createWall(300, 200, 200, 40);
+        createWall(600, 400, 40, 200);
+        createWall(900, 150, 150, 40);
+    }
 }
 
 // =========================
@@ -560,10 +572,15 @@ function createBot(id) {
     if (id == 1) {
         if (!isMobile()) {
             posicaobotx = 50;
-            posicaoboty = window.innerHeight - 50;
+            posicaoboty = window.innerHeight - 30;
         }
     } else if (id == 2) {
-        posicaobotx = window.innerWidth - posicaobotx;
+        if (isMobile()) {
+            posicaobotx = window.innerWidth - 100;
+            posicaoboty = window.innerHeight - 30;
+        } else {
+            posicaobotx = window.innerWidth - posicaobotx;
+        }
     } else if (id == 3) {
         posicaobotx = window.innerWidth - posicaobotx;
         posicaoboty = window.innerHeight - posicaoboty;
@@ -1049,8 +1066,13 @@ function updateBullets() {
         }
 
         b.life++;
-        b.vx *= 0.995;
-        b.vy *= 0.995;
+        if (isMobile()) {
+            b.vx *= 0.99;
+            b.vy *= 0.99;
+        } else {
+            b.vx *= 0.995;
+            b.vy *= 0.995;
+        }
 
         for (const w of walls) {
             const hitWall =
@@ -1250,7 +1272,7 @@ function checkColetou() {
                 }
 
                 return false; // remove da lista
-                updateHUD()
+                updateHUD();
             }
         }
         return true;
@@ -1338,10 +1360,10 @@ function loop() {
             t.slowed = false;
             t.el.style.filter = "grayscale(0%)";
 
-            if (t.ammoType == 1) t.speed = 2;
-            if (t.ammoType == 2) t.speed = 2.5;
-            if (t.ammoType == 3) t.speed = 1.5;
-            if (t.ammoType == 4) t.speed = 2.7;
+            if (t.ammoType == 1) t.speed = tankTypes[1].speed;
+            if (t.ammoType == 2) t.speed = tankTypes[2].speed;
+            if (t.ammoType == 3) t.speed = tankTypes[3].speed;
+            if (t.ammoType == 4) t.speed = tankTypes[4].speed;
         }
     });
 

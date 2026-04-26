@@ -59,7 +59,7 @@ if (isMobile()) {
 
     document.getElementById("configScreen").children[4].style.display = "none";
 
-    posicaobotx = window.innerWidth - 100;
+    pisicaobotx = 40;
     posicaoboty = window.innerHeight;
 }
 

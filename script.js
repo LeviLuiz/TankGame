@@ -52,14 +52,13 @@ function tocarSom(audio) {
 }
 
 if (isMobile()) {
-    linhas[2].removeChild(linhas[2].children[1]);
     linhas[1].children[1].style.display = "none";
     linhas[2].children[0].style.display = "none";
     linhas[1].style.height = "100dvh";
 
     document.getElementById("configScreen").children[4].style.display = "none";
 
-    posicaobotx = window.innerWidth - 90;
+    posicaobotx = 40;
     posicaoboty = window.innerHeight;
 }
 
@@ -106,6 +105,52 @@ document.addEventListener("keyup", (e) => {
     keys[e.code] = false;
 });
 
+const tankTypes = {
+    1: {
+        nome: "Tanque tipo 1",
+        vida: 100,
+        speed: 2,
+        ammo: 7,
+        reload: 2000,
+        turretSpeed: 0.07,
+        damage: 50,
+        ammoType: 1,
+    },
+
+    2: {
+        nome: "Tanque tipo 2",
+        vida: 80,
+        speed: 2.5,
+        ammo: 12,
+        reload: 800,
+        turretSpeed: 0.1,
+        damage: 20,
+        ammoType: 2,
+    },
+
+    3: {
+        nome: "Tanque tipo 3",
+        vida: 150,
+        speed: 1.5,
+        ammo: 6,
+        reload: 2500,
+        turretSpeed: 0.05,
+        damage: 60,
+        ammoType: 3,
+    },
+
+    4: {
+        nome: "Tanque tipo 4",
+        vida: 70,
+        speed: 3,
+        ammo: 30,
+        reload: 400,
+        turretSpeed: 0.05,
+        damage: 10,
+        ammoType: 4,
+    },
+};
+
 function isMobile() {
     return (
         /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
@@ -131,19 +176,70 @@ function verMode() {
     linhas[1].children[0].style.display = "block";
     linhas[1].children[1].style.display = "block";
     linhas[2].children[0].style.display = "block";
+    linhas[2].children[1].style.display = "block";
     linhas[1].style.height = "50dvh";
 
     linhas[1].children[0].children[0].innerHTML = "Tanque tipo 1";
     linhas[1].children[1].children[0].innerHTML = "Tanque tipo 2";
     linhas[2].children[0].children[0].innerHTML = "Tanque tipo 3";
+    linhas[2].children[1].children[0].innerHTML = "Tanque tipo 4";
 
     linhas[1].children[0].children[1].style.display = "block";
     linhas[1].children[1].children[1].style.display = "block";
     linhas[2].children[0].children[1].style.display = "block";
+    linhas[2].children[1].children[1].style.display = "block";
 
-    if (player < 1 && !isMobile()) {
-        linhas[2].removeChild(linhas[2].children[1]);
-    }
+    // tankType 1
+    linhas[1].children[0].children[1].children[1].innerHTML =
+        "Vida: " + tankTypes[1].vida;
+
+    linhas[1].children[0].children[1].children[2].innerHTML =
+        "Munição: " + tankTypes[1].ammo;
+
+    linhas[1].children[0].children[1].children[3].innerHTML =
+        "Recarga: " + tankTypes[1].reload / 1000;
+
+    linhas[1].children[0].children[1].children[4].innerHTML =
+        "Dano: " + tankTypes[1].damage;
+
+    // tankType 2
+    linhas[1].children[1].children[1].children[1].innerHTML =
+        "Vida: " + tankTypes[2].vida;
+
+    linhas[1].children[1].children[1].children[2].innerHTML =
+        "Munição: " + tankTypes[2].ammo;
+
+    linhas[1].children[1].children[1].children[3].innerHTML =
+        "Recarga: " + tankTypes[2].reload / 1000;
+
+    linhas[1].children[1].children[1].children[4].innerHTML =
+        "Dano: " + tankTypes[2].damage;
+
+    // tankType 3
+    linhas[2].children[0].children[1].children[1].innerHTML =
+        "Vida: " + tankTypes[3].vida;
+
+    linhas[2].children[0].children[1].children[2].innerHTML =
+        "Munição: " + tankTypes[3].ammo;
+
+    linhas[2].children[0].children[1].children[3].innerHTML =
+        "Recarga: " + tankTypes[3].reload / 1000;
+
+    linhas[2].children[0].children[1].children[4].innerHTML =
+        "Dano: " + tankTypes[3].damage;
+
+    // tankType 4
+    linhas[2].children[1].children[1].children[1].innerHTML =
+        "Vida: " + tankTypes[4].vida;
+
+    linhas[2].children[1].children[1].children[2].innerHTML =
+        "Munição: " + tankTypes[4].ammo;
+
+    linhas[2].children[1].children[1].children[3].innerHTML =
+        "Recarga: " + tankTypes[4].reload / 1000;
+
+    linhas[2].children[1].children[1].children[4].innerHTML =
+        "Dano: " + tankTypes[4].damage;
 
     linhas[1].children[0].onclick = function () {
         playerTankTypes[player - 1] = 1;
@@ -388,76 +484,36 @@ function startMatch(players, bots = 0) {
             posicaox = window.innerWidth - 100;
             posicaoy = window.innerHeight - 100;
         }
-
-        let t;
-
         const type = playerTankTypes[i];
+        const config = tankTypes[type];
 
-        if (type == 1) {
-            t = {
-                id: i,
-                vida: 100,
-                el,
-                x: posicaox,
-                y: posicaoy,
-                speed: 2,
-                alive: true,
-                cooldown: false,
-                ammo: 7,
-                score: 0,
-                controls: getSavedControls()[i],
-                angle: 0,
-                turretAngle: 0,
-                reload: 2000,
-                slowed: false,
-                ammoType: 1,
-                turretSpeed: 0.07,
-            };
-        }
+        const t = {
+            id: i,
 
-        if (type == 2) {
-            t = {
-                id: i,
-                vida: 80,
-                el,
-                x: posicaox,
-                y: posicaoy,
-                speed: 2.5,
-                alive: true,
-                cooldown: false,
-                ammo: 12,
-                score: 0,
-                controls: getSavedControls()[i],
-                angle: 0,
-                turretAngle: 0,
-                reload: 800,
-                slowed: false,
-                ammoType: 2,
-                turretSpeed: 0.1,
-            };
-        }
+            vida: config.vida,
+            el,
 
-        if (type == 3) {
-            t = {
-                id: i,
-                vida: 150,
-                el,
-                x: posicaox,
-                y: posicaoy,
-                speed: 1.5,
-                alive: true,
-                cooldown: false,
-                ammo: 6,
-                score: 0,
-                controls: getSavedControls()[i],
-                angle: 0,
-                turretAngle: 0,
-                reload: 2500,
-                slowed: false,
-                ammoType: 3,
-                turretSpeed: 0.05,
-            };
-        }
+            x: posicaox,
+            y: posicaoy,
+
+            speed: config.speed,
+            alive: true,
+            cooldown: false,
+
+            ammo: config.ammo,
+            score: 0,
+
+            controls: getSavedControls()[i],
+
+            angle: 0,
+            turretAngle: 0,
+
+            reload: config.reload,
+            slowed: false,
+
+            ammoType: config.ammoType,
+            turretSpeed: config.turretSpeed,
+        };
 
         el.style.left = t.x + "px";
         el.style.top = t.y + "px";

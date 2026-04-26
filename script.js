@@ -1124,7 +1124,7 @@ function checkWin() {
 }
 
 function addPowerUps() {
-    chance = Math.round(Math.random() * 500);
+    chance = Math.round(Math.random() * 600);
     if (chance == 1) {
         powerUpRoleta = Math.round(Math.random() * 3);
         powerUp = powerUps[powerUpRoleta];
@@ -1134,11 +1134,13 @@ function addPowerUps() {
 
 function createPowerUp(power) {
     const item = document.createElement("div");
-
+    
+    if (type == 'speed') item.style.background = 'blue'
+    if (type == 'ammo') item.style.background = 'red'
+    if (type == 'health') item.style.background = 'green'
     item.style.position = "absolute";
     item.style.width = "40px";
     item.style.height = "40px";
-    item.style.background = "orange";
     item.style.borderRadius = "8px";
 
     const x = Math.random() * (window.innerWidth - 20);

@@ -1,4 +1,4 @@
-const version = "1.2.1";
+const version = "1.2.2";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -110,10 +110,11 @@ const tankTypes = {
         vida: 100,
         speed: 2,
         ammo: 7,
-        reload: 2000,
+        reload: 1900,
         turretSpeed: 0.07,
         damage: 50,
         ammoType: 1,
+        rotationSpeed: 0.05,
     },
 
     2: {
@@ -121,10 +122,11 @@ const tankTypes = {
         vida: 80,
         speed: 2.5,
         ammo: 12,
-        reload: 800,
+        reload: 900,
         turretSpeed: 0.1,
         damage: 20,
         ammoType: 2,
+        rotationSpeed: 0.06,
     },
 
     3: {
@@ -136,6 +138,7 @@ const tankTypes = {
         turretSpeed: 0.05,
         damage: 60,
         ammoType: 3,
+        rotationSpeed: 0.04,
     },
 
     4: {
@@ -144,41 +147,12 @@ const tankTypes = {
         speed: 2.7,
         ammo: 30,
         reload: 500,
-        turretSpeed: 0.08,
+        turretSpeed: 0.15,
         damage: 10,
         ammoType: 4,
+        rotationSpeed: 0.08,
     },
 };
-
-function isMobile() {
-    return (
-        /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(
-            navigator.userAgent,
-        ) ||
-        window.innerWidth <= 900 ||
-        "ontouchstart" in window
-    );
-}
-
-if (isMobile()) {
-    focarPaisagem();
-
-    linhas[1].children[1].style.display = "none";
-    linhas[2].children[0].style.display = "none";
-    linhas[1].style.height = "100dvh";
-
-    document.getElementById("configScreen").children[4].style.display = "none";
-
-    posicaobotx = window.innerWidth - 100;
-    posicaoboty = 150;
-
-    document.getElementById("botsConfig").max = 2;
-
-    for (i = 1; i <= 4; i++) {
-        tankTypes[i].speed /= 2;
-        tankTypes[i].reload = Math.round(tankTypes[i].reload * 1.5);
-    }
-}
 
 // =========================
 // MODE
@@ -543,6 +517,7 @@ function startMatch(players, bots = 0) {
 
             ammoType: config.ammoType,
             turretSpeed: config.turretSpeed,
+            rotationSpeed: config.rotationSpeed,
         };
 
         el.style.left = t.x + "px";
@@ -615,6 +590,7 @@ function createBot(id) {
         angle: 0,
         turretAngle: 0,
         turretSpeed: tankTypes[botType].turretSpeed,
+        rotationSpeed: tankTypes[botType].rotationSpeed,
 
         score: 0,
 
@@ -711,7 +687,7 @@ function moveBot(t) {
     let bodyDiff = desiredTurret - t.angle;
     bodyDiff = Math.atan2(Math.sin(bodyDiff), Math.cos(bodyDiff));
 
-    const ROT_SPEED = 0.04;
+    const ROT_SPEED = t.rotationSpeed;
 
     if (bodyDiff > 0) {
         t.angle += ROT_SPEED;
@@ -857,8 +833,8 @@ function isColliding(x, y) {
 function moveTank(t) {
     if (!t.alive) return;
 
-    const ROT_SPEED = 0.05;
     const MOVE_SPEED = t.speed;
+    const ROT_SPEED = t.rotationSpeed;
 
     let newX = t.x;
     let newY = t.y;
@@ -1269,10 +1245,10 @@ function checkColetou() {
                     if (t.ammoType == 4) {
                         t.ammo = Math.min(t.ammo + 4, 30);
                     }
+                    updateHUD();
                 }
 
                 return false; // remove da lista
-                updateHUD();
             }
         }
         return true;

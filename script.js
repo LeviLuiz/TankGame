@@ -173,10 +173,10 @@ function verMode() {
     linhas[2].children[1].style.display = "block";
     linhas[1].style.height = "50dvh";
 
-    linhas[1].children[0].children[0].innerHTML = "Tanque tipo 1";
-    linhas[1].children[1].children[0].innerHTML = "Tanque tipo 2";
-    linhas[2].children[0].children[0].innerHTML = "Tanque tipo 3";
-    linhas[2].children[1].children[0].innerHTML = "Tanque tipo 4";
+    linhas[1].children[0].children[0].innerHTML = "Tanque Médio";
+    linhas[1].children[1].children[0].innerHTML = "Tanque Leve";
+    linhas[2].children[0].children[0].innerHTML = "Tanque Pesado";
+    linhas[2].children[1].children[0].innerHTML = "Tanque Leve";
 
     linhas[1].children[0].children[1].style.display = "block";
     linhas[1].children[1].children[1].style.display = "block";

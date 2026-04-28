@@ -7,6 +7,7 @@
 body {
     touch-action: none;
     overflow: hidden;
+    background-color: #1a1a1a;
 }
 
 #config {
@@ -30,6 +31,7 @@ body {
 }
 
 .version {
+    background-color: #c0c0c0;
     padding: 3px;
     position: absolute;
     bottom: 5px;

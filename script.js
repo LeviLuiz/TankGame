@@ -1325,9 +1325,13 @@ function checkColision() {
 function loop() {
     if (paused) {
         requestAnimationFrame(loop);
+    
         tanks.forEach((t) => {
-            moveTank(t);
+            if (t.controls) {
+                moveTank(t);
+            }
         });
+    
         return;
     }
 

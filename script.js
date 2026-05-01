@@ -299,10 +299,10 @@ function createWall(x, y, w, h) {
 
 function createMap() {
     // bordas
-    createWall(0, 0, window.innerWidth, 5);
-    createWall(0, window.innerHeight - 5, window.innerWidth, 5);
+    createWall(0, 0, window.innerWidth, 2);
+    createWall(0, window.innerHeight - 2, window.innerWidth, 2);
     createWall(0, 0, 5, window.innerHeight);
-    createWall(window.innerWidth - 5, 0, 5, window.innerHeight);
+    createWall(window.innerWidth - 2, 0, 2, window.innerHeight);
 
     // obstáculos no meio
     if (isMobile()) {

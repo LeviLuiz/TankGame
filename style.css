@@ -7,7 +7,7 @@
 :root {
     --corBranca: White;
     --corPreta: #1e1e1e;
-    --corCinza: #a1a1a1;
+    --corCinza: #bbbbbb;
     --stroke-color: rgba(83, 83, 83, 0.45);
     --surface-color: #bdbdbd11;
     --surface-color-hover: rgba(0, 0, 0, 0.02);
@@ -18,7 +18,7 @@
 .light {
     --corBranca: #1e1e1e;
     --corPreta: white;
-    --corCinza: #666666;
+    --corCinza: #b9b9b9;
     --stroke-color: rgba(230, 230, 230, 0.45);
     --surface-color: rgba(255, 255, 255, 0.06);
     --surface-color-hover: rgba(0, 0, 0, 0.02);
@@ -61,10 +61,7 @@ body {
     border-radius: 5px;
     border: 1px solid gray;
     transition: all 200ms;
-
-    &:hover {
-        background-color: #c0c0c0;
-    }
+    cursor: default;
 }
 
 #overlay {

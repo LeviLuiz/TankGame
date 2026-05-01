@@ -290,7 +290,7 @@ function createWall(x, y, w, h) {
     el.style.width = w + "px";
     el.style.height = h + "px";
     el.style.background = "#444";
-    el.style.border = "2px solid #111";
+    el.style.border = "2px solid var(--corPreta)";
 
     body.appendChild(el);
 

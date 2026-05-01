@@ -1,4 +1,4 @@
-const version = "1.2.6";
+const version = "1.2.7";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -1361,6 +1361,12 @@ function loop() {
 }
 
 function openConfig() {
+    document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+            key: "p",
+            code: "KeyP"
+        })
+    );
     document.getElementById("configScreen").style.display = "flex";
     document.getElementById("overlay").style.display = "block";
 }

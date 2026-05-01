@@ -245,14 +245,6 @@ body {
     width: 100%;
 }
 
-#projetil {
-    background-color: red;
-    width: 8px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    display: none;
-}
-
 #mobileButtons {
     display: none;
 }

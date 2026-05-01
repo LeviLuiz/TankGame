@@ -147,7 +147,7 @@ const tankTypes = {
         speed: 2.7,
         ammo: 30,
         reload: 500,
-        turretSpeed: 0.15,
+        turretSpeed: 0.12,
         damage: 10,
         ammoType: 4,
         rotationSpeed: 0.08,

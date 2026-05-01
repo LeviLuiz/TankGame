@@ -349,6 +349,11 @@ function createTankEl(color) {
     cannon.style.top = "7px";
     cannon.style.left = "20px";
     cannon.style.borderRadius = "3px";
+    if (document.documentElement.classList.contains("light")) {
+        cannon.style.borderRight = "1px solid var(--corPreta)";
+        cannon.style.borderBottom = "1px solid var(--corPreta)";
+        cannon.style.borderTop = "1px solid var(--corPreta)";
+    }
 
     // junta os dois
     turret.appendChild(cannon);
@@ -912,7 +917,7 @@ function shoot(t, robo) {
     bulletEl.style.width = BULLET_SIZE + "px";
     bulletEl.style.height = BULLET_SIZE + "px";
     bulletEl.style.borderRadius = "50%";
-    bulletEl.style.background = "black";
+    bulletEl.style.background = "var(--corPreta)";
 
     body.appendChild(bulletEl);
 

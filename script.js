@@ -1170,7 +1170,7 @@ function createPowerUp(power) {
     item.style.width = "40px";
     item.style.height = "40px";
     item.style.borderRadius = "8px";
-    item.style.border = '1px solid var(--corPreta)'
+    item.style.border = "1px solid var(--corPreta)";
 
     const x = Math.random() * (window.innerWidth - 20);
     const y = Math.random() * (window.innerHeight - 20);
@@ -1325,13 +1325,13 @@ function checkColision() {
 function loop() {
     if (paused) {
         requestAnimationFrame(loop);
-    
+
         tanks.forEach((t) => {
             if (t.controls) {
                 moveTank(t);
             }
         });
-    
+
         return;
     }
 
@@ -1368,14 +1368,20 @@ function openConfig() {
     document.dispatchEvent(
         new KeyboardEvent("keydown", {
             key: "p",
-            code: "KeyP"
-        })
+            code: "KeyP",
+        }),
     );
     document.getElementById("configScreen").style.display = "flex";
     document.getElementById("overlay").style.display = "block";
 }
 
 function salvarConfig() {
+    document.dispatchEvent(
+        new KeyboardEvent("keydown", {
+            key: "p",
+            code: "KeyP",
+        }),
+    );
     botsNumber = document.getElementById("botsConfig").value;
 
     localStorage.setItem("bots", botsNumber);

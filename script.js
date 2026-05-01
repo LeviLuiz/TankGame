@@ -1170,6 +1170,7 @@ function createPowerUp(power) {
     item.style.width = "40px";
     item.style.height = "40px";
     item.style.borderRadius = "8px";
+    item.style.border = '1px solid var(--corPreta)'
 
     const x = Math.random() * (window.innerWidth - 20);
     const y = Math.random() * (window.innerHeight - 20);

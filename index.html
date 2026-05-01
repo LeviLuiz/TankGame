@@ -31,6 +31,10 @@
         </button>
         <div id="overlay"></div>
         <div id="configScreen">
+            <div id="switch" onclick="toggleMode()">
+                <button></button>
+                <span></span>
+            </div>
             <label for="botsConfig" id="botsNumber">Número de Bots: 0</label>
             <br />
             <input
@@ -155,25 +159,8 @@
             </div>
         </div>
         <div id="game">
-            <div class="reload" style="display: none">
-                <h2 id="reloadTime">Recarregado</h2>
-            </div>
             <div class="score">
                 <h2 id="scoreScreen">Score: 0</h2>
-            </div>
-            <div id="tank" style="display: none">
-                <div id="torre">
-                    <div id="cabeca"></div>
-                    <div id="cano"></div>
-                </div>
-                <div id="corpo"></div>
-            </div>
-            <div id="inimigo">
-                <div id="torrei">
-                    <div id="cabecai"></div>
-                    <div id="canoi"></div>
-                </div>
-                <div id="corpoi"></div>
             </div>
         </div>
         <div class="version">

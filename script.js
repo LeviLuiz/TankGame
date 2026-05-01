@@ -306,7 +306,7 @@ function createMap() {
 
     // obstáculos no meio
     if (isMobile()) {
-        createWall((window.innerWidth - 250), 130, 200, 40);
+        createWall(window.innerWidth - 250, 130, 200, 40);
     } else {
         createWall(300, 200, 200, 40);
         createWall(600, 400, 40, 200);
@@ -1361,9 +1361,26 @@ function openConfig() {
 
 function salvarConfig() {
     botsNumber = document.getElementById("botsConfig").value;
-    localStorage.setItem("bots", document.getElementById("botsConfig").value);
+
+    localStorage.setItem("bots", botsNumber);
+
+    if (document.documentElement.classList.contains("light")) {
+        localStorage.setItem("darkMode", "true");
+    } else {
+        localStorage.setItem("darkMode", "false");
+    }
+
     document.getElementById("configScreen").style.display = "none";
     document.getElementById("overlay").style.display = "none";
+}
+
+function toggleMode() {
+    const html = document.documentElement;
+    html.classList.toggle("light");
+}
+
+if (localStorage.getItem("darkMode") === "true") {
+    toggleMode();
 }
 
 // CONTROLES MOBILE

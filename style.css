@@ -4,10 +4,32 @@
     box-sizing: border-box;
 }
 
+:root {
+    --corBranca: White;
+    --corPreta: #1e1e1e;
+    --corCinza: #a1a1a1;
+    --stroke-color: rgba(83, 83, 83, 0.45);
+    --surface-color: #bdbdbd11;
+    --surface-color-hover: rgba(0, 0, 0, 0.02);
+    --highlight-color: rgba(255, 255, 255, 0.2);
+    --switch-bg-url: url(sun.svg);
+}
+
+.light {
+    --corBranca: #1e1e1e;
+    --corPreta: white;
+    --corCinza: #666666;
+    --stroke-color: rgba(230, 230, 230, 0.45);
+    --surface-color: rgba(255, 255, 255, 0.06);
+    --surface-color-hover: rgba(0, 0, 0, 0.02);
+    --highlight-color: rgba(0, 0, 0, 0.1);
+    --switch-bg-url: url(moon-stars.svg);
+}
+
 body {
     touch-action: none;
     overflow: hidden;
-    background-color: #1a1a1a;
+    background-color: var(--corBranca);
 }
 
 #config {
@@ -48,7 +70,7 @@ body {
 #overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     backdrop-filter: blur(4px) grayscale(100%);
     z-index: 10;
     display: none;
@@ -60,12 +82,12 @@ body {
     left: 50%;
     transform: translate(-50%, -50%) scale(0.9);
 
-    background: #1e1e1e;
-    color: white;
+    background: var(--corBranca);
+    color: var(--corPreta);
     padding: 25px 50px;
     border-radius: 12px;
 
-    box-shadow: 0 0 40px rgba(0,0,0,0.7);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.7);
 
     z-index: 20;
     display: none;
@@ -78,12 +100,53 @@ body {
         border-radius: 10px;
         border: none;
         cursor: pointer;
+        border: 1px solid var(--corCinza);
         transition: all 200ms;
 
         &:hover {
-            background: #bbbbbb;
+            background: var(--corCinza);
         }
     }
+}
+
+/* Botão */
+#switch {
+    position: relative;
+    width: 60px;
+    margin: 1px auto;
+}
+
+#switch button {
+    margin-left: 1px;
+    width: 25px;
+    height: 25px;
+    background: white var(--switch-bg-url) no-repeat center;
+    border: 0;
+    border-radius: 75%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    z-index: 1;
+    transform: translateY(-50%);
+    animation: slide-out 0.3s forwards;
+}
+
+.light #switch button {
+    animation: slide-in 0.3s forwards;
+}
+
+#switch button:hover {
+    outline: 5.5px solid var(--highlight-color);
+}
+
+#switch span {
+    display: block;
+    width: 61px;
+    height: 25px;
+    background: var(--surface-color);
+    border: 1px solid var(--stroke-color);
+    backdrop-filter: blur(4px);
+    border-radius: 110px;
 }
 
 #game {
@@ -201,7 +264,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(255,255,255,0.2);
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 50%;
     bottom: 40px;
     user-select: none;
@@ -216,13 +279,34 @@ body {
     }
 }
 
-#btnUp { left: 100px; bottom: 120px; }
-#btnLeft { left: 20px; bottom: 60px;}
-#btnRight { left: 180px; bottom: 60px;}
-#btnDown { left: 100px; bottom: 10px; }
-#torLeft { right: 170px; bottom: 60px;}
-#torRight { right: 10px; bottom: 60px;}
-#btnFire { right: 90px; bottom: 60px;}
+#btnUp {
+    left: 100px;
+    bottom: 120px;
+}
+#btnLeft {
+    left: 20px;
+    bottom: 60px;
+}
+#btnRight {
+    left: 180px;
+    bottom: 60px;
+}
+#btnDown {
+    left: 100px;
+    bottom: 10px;
+}
+#torLeft {
+    right: 170px;
+    bottom: 60px;
+}
+#torRight {
+    right: 10px;
+    bottom: 60px;
+}
+#btnFire {
+    right: 90px;
+    bottom: 60px;
+}
 
 #mobileButtons {
     position: fixed;
@@ -232,4 +316,23 @@ body {
 
 #mobileButtons .btn {
     pointer-events: auto;
+}
+
+/* Animação e Distância que o Botão vai */
+@keyframes slide-in {
+  from {
+    left: 0;
+  }
+  to {
+    left: 59%;
+  }
+}
+
+@keyframes slide-out {
+  from {
+    left: 50%;
+  }
+  to {
+    left: 0;
+  }
 }

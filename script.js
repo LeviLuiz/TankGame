@@ -1,4 +1,4 @@
-const version = "1.2.10";
+const version = "1.2.11";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -106,12 +106,9 @@ document.addEventListener("keyup", (e) => {
     keys[e.code] = false;
 
     for (const t of tanks) {
-        if (!t.controls) continue;
+        if (!t.controls || !t.alive || t.isBot) continue;
 
-        if (
-            e.code === t.controls.up ||
-            e.code === t.controls.down
-        ) {
+        if (e.code === t.controls.up || e.code === t.controls.down) {
             tocarSom(descompressingSom);
         }
     }
@@ -1041,6 +1038,8 @@ function shoot(t, robo) {
 }
 
 function die(t, b) {
+    movingSom.pause();
+    movingSom.currentTime = 0;
     t.alive = false;
     b.owner.score++;
     t.el.style.filter = "grayscale(100%)";
@@ -1051,6 +1050,8 @@ function die(t, b) {
 }
 
 function dieColision(t, t2) {
+    movingSom.pause();
+    movingSom.currentTime = 0;
     t.alive = false;
     t2.score++;
     t.el.style.filter = "grayscale(100%)";
@@ -1158,7 +1159,7 @@ function checkLoot() {
 
                     t.el.innerText = ""; // limpa texto
                     t.el.style.opacity = "0.3";
-                    updateHUD()
+                    updateHUD();
                 }
             }
         }

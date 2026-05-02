@@ -8,6 +8,8 @@ const scoreScreen = document.getElementById("scoreScreen");
 const tiroSom = new Audio("disparo.mp3");
 const explosaoSom = new Audio("explosao.mp3");
 const clickSom = new Audio("click.mp3");
+const victorySom = new Audio("victory.mp3");
+const defeatSom = new Audio("defeat.mp3");
 const movingSom = new Audio("moving.mp3");
 const descompressingSom = new Audio("descompressing.mp3");
 const linhas = choice.children;
@@ -49,7 +51,11 @@ function setControl(playerIndex, action) {
 }
 
 function tocarSom(audio) {
-    audio.volume = 0.3;
+    if (audio == victorySom || audio == defeatSom) {
+        audio.volume = 0.9;
+    } else {
+        audio.volume = 0.3;
+    }
     audio.currentTime = 0;
     audio.play();
 }
@@ -1176,14 +1182,23 @@ function checkWin() {
         setTimeout(() => {
             tiroSom.pause();
             tiroSom.currentTime = 0;
-            explosaoSom.pause();
-            explosaoSom.currentTime = 0;
-            clickSom.pause();
-            clickSom.currentTime = 0;
             movingSom.pause();
             movingSom.currentTime = 0;
             descompressingSom.pause();
             descompressingSom.currentTime = 0;
+            if (tanks[0].vida > 0) {
+                if (mode == 1) {
+                    tocarSom(victorySom);
+                } else if (mode == 2 && (tanks[0].vida > 0 || tanks[1].vida > 0)) {
+                    tocarSom(victorySom);
+                } else if (mode == 3 && (tanks[0].vida > 0 || tanks[1].vida > 0 || tanks[2].vida > 0)) {
+                    tocarSom(victorySom);
+                } else if (mode == 4 && (tanks[0].vida > 0 || tanks[1].vida > 0 || tanks[2].vida > 0 || tanks[3].vida > 0)) {
+                    tocarSom(victorySom);
+                }
+            } else {
+                tocarSom(defeatSom)
+            }
             alert(`Jogador ${alive[0].id + 1} venceu!`);
             location.reload();
         }, 100);

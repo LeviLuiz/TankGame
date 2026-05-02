@@ -1174,10 +1174,30 @@ function checkWin() {
 
     if (alive.length === 1 && tanks.length > 1) {
         setTimeout(() => {
+            tiroSom.pause();
+            tiroSom.currentTime = 0;
+            explosaoSom.pause();
+            explosaoSom.currentTime = 0;
+            clickSom.pause();
+            clickSom.currentTime = 0;
+            movingSom.pause();
+            movingSom.currentTime = 0;
+            descompressingSom.pause();
+            descompressingSom.currentTime = 0;
             alert(`Jogador ${alive[0].id + 1} venceu!`);
             location.reload();
         }, 100);
     } else if (alive.length === 0) {
+        tiroSom.pause();
+        tiroSom.currentTime = 0;
+        explosaoSom.pause();
+        explosaoSom.currentTime = 0;
+        clickSom.pause();
+        clickSom.currentTime = 0;
+        movingSom.pause();
+        movingSom.currentTime = 0;
+        descompressingSom.pause();
+        descompressingSom.currentTime = 0;
         alert(`O jogo Empatou`);
         location.reload();
     }

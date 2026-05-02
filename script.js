@@ -1,4 +1,4 @@
-const version = "1.2.8";
+const version = "1.2.9";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 
@@ -1128,6 +1128,7 @@ function checkLoot() {
 
                     t.el.innerText = ""; // limpa texto
                     t.el.style.opacity = "0.3";
+                    updateHUD()
                 }
             }
         }

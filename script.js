@@ -1,4 +1,4 @@
-const version = "1.2.9";
+const version = "1.2.10";
 document.getElementById("versionText").innerHTML = version;
 const body = document.body;
 

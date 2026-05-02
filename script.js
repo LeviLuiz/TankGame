@@ -8,6 +8,8 @@ const scoreScreen = document.getElementById("scoreScreen");
 const tiroSom = new Audio("disparo.mp3");
 const explosaoSom = new Audio("explosao.mp3");
 const clickSom = new Audio("click.mp3");
+const movingSom = new Audio("moving.mp3");
+const descompressingSom = new Audio("descompressing.mp3");
 const linhas = choice.children;
 
 let mode = 0;
@@ -102,6 +104,17 @@ document.addEventListener("keydown", (e) => {
 
 document.addEventListener("keyup", (e) => {
     keys[e.code] = false;
+
+    for (const t of tanks) {
+        if (!t.controls) continue;
+
+        if (
+            e.code === t.controls.up ||
+            e.code === t.controls.down
+        ) {
+            tocarSom(descompressingSom);
+        }
+    }
 });
 
 const tankTypes = {
@@ -835,11 +848,15 @@ function isColliding(x, y) {
     });
 }
 
+let movingPlaying = false;
+
 function moveTank(t) {
     if (!t.alive) return;
 
     const MOVE_SPEED = t.speed;
     const ROT_SPEED = t.rotationSpeed;
+
+    let moving = false;
 
     let newX = t.x;
     let newY = t.y;
@@ -857,11 +874,24 @@ function moveTank(t) {
     if (keys[t.controls.up]) {
         newX += Math.cos(t.angle) * MOVE_SPEED;
         newY += Math.sin(t.angle) * MOVE_SPEED;
+        moving = true;
     }
 
     if (keys[t.controls.down]) {
         newX -= Math.cos(t.angle) * MOVE_SPEED * 0.6;
         newY -= Math.sin(t.angle) * MOVE_SPEED * 0.6;
+        moving = true;
+    }
+
+    if (moving) {
+        if (movingSom.paused) {
+            movingSom.loop = true;
+            movingSom.volume = 0.3;
+            movingSom.play();
+        }
+    } else {
+        movingSom.pause();
+        movingSom.currentTime = 0;
     }
 
     // colisão (AGORA FUNCIONA)
